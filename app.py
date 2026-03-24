@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 app.secret_key = "AK_ELECTRONICS_2026_SECURE"
 
 # --- ☁️ CLOUD DATABASE CONFIGURATION ---
