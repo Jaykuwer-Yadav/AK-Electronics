@@ -188,7 +188,17 @@ def login():
                 if not is_firebase_init:
                     return "Firebase not initialized on server. Check logs.", 500
                 
-                decoded_token = fb_auth.verify_id_token(id_token)
+                try:
+                    decoded_token = fb_auth.verify_id_token(id_token)
+                except Exception as skew_err:
+                    if "Token used too early" in str(skew_err):
+                        import time
+                        print("⏳ Clock skew detected, retrying after delay...")
+                        time.sleep(1.5)
+                        decoded_token = fb_auth.verify_id_token(id_token)
+                    else:
+                        raise skew_err
+
                 uid = decoded_token['uid']
                 email = decoded_token.get('email')
                 
