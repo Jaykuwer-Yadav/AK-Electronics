@@ -28,15 +28,23 @@ db = SQLAlchemy(app)
 # --- 🎯 FIREBASE ADMIN SDK ---
 import json
 firebase_key_path = "firebase_key.json"
+
 if os.path.exists(firebase_key_path):
     cred = credentials.Certificate(firebase_key_path)
     firebase_admin.initialize_app(cred)
-elif os.environ.get("FIREBASE_KEY"):
-    key_dict = json.loads(os.environ.get("FIREBASE_KEY"))
-    cred = credentials.Certificate(key_dict)
-    firebase_admin.initialize_app(cred)
 else:
-    print("⚠️ Firebase Key not found. Backend features may fail.")
+    firebase_config_env = os.environ.get('FIREBASE_KEY')
+    if firebase_config_env:
+        # Load from environment variable (for Render/Deployment)
+        key_dict = json.loads(firebase_config_env)
+        # THE MAGIC FIX: Replace literal "\\n" with real newlines
+        if 'private_key' in key_dict:
+            key_dict['private_key'] = key_dict['private_key'].replace('\\n', '\n')
+        
+        cred = credentials.Certificate(key_dict)
+        firebase_admin.initialize_app(cred)
+    else:
+        print("⚠️ Firebase Key not found. Backend features may fail.")
 
 fb_db = firestore.client()
 print("✅ Firebase Admin initialized successfully!")

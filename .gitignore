@@ -17,6 +17,7 @@ ENV/
 instance/
 .webassets-cache
 .env
+.env.local
 .flaskenv
 
 # OS
