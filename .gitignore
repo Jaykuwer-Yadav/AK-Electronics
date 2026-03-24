@@ -1,0 +1,24 @@
+# Sensitive Data
+firebase_key.json
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+
+# Flask/Instance
+instance/
+.webassets-cache
+.env
+.flaskenv
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | AK Electronics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      .checkout-container {
+        max-width: 500px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 15px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+      .total-box {
+        background: var(--bg-color);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 25px;
+        border: 2px dashed var(--primary);
+      }
+    </style>
+  </head>
+  <body class="store-body">
+    <nav class="navbar" style="flex-wrap: wrap">
+      <a href="{{ url_for('index') }}" style="text-decoration: none; order: 1">
+        <div
+          class="brand-logo"
+          style="
+            margin: 0;
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 24px;
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <div class="hamburger-menu" onclick="toggleMenu()" style="order: 2">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <div class="nav-content" id="navMenu">
+        <div
+          class="theme-switch-wrapper"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+          "
+        >
+          <label class="theme-switch">
+            <input
+              type="checkbox"
+              id="theme-checkbox"
+              onclick="toggleTheme()"
+            />
+            <div class="slider">
+              <span class="icon moon">🌙</span>
+              <span class="icon sun">☀️</span>
+            </div>
+          </label>
+        </div>
+        <a
+          href="{{ url_for('cart') }}"
+          class="mobile-nav-link"
+          style="font-weight: 600; text-decoration: none; color: var(--primary)"
+          >🛒 My Cart</a
+        >
+        <a
+          href="{{ url_for('logout') }}"
+          class="mobile-nav-link logout-text"
+          style="color: var(--text-muted); text-decoration: none"
+          >Logout</a
+        >
+      </div>
+    </nav>
+
+    <main class="store-container">
+      <div class="checkout-container">
+        <h2 style="margin-bottom: 20px; text-align: center">
+          Secure Checkout 🔒
+        </h2>
+
+        <div class="total-box">
+          <p
+            style="color: var(--text-muted); font-size: 14px; font-weight: 600"
+          >
+            Total Amount to Pay
+          </p>
+          <h3 style="color: var(--primary); font-size: 32px; margin-top: 5px">
+            ₹{{ total }}
+          </h3>
+        </div>
+
+        <form
+          id="checkoutForm"
+          action="{{ url_for('checkout') }}"
+          method="POST"
+        >
+          <div class="input-group">
+            <label style="font-weight: 600; margin-bottom: 8px; display: block"
+              >Phone Number</label
+            >
+            <div style="display: flex; gap: 10px">
+              <select
+                id="countryCode"
+                required
+                style="
+                  width: 140px;
+                  padding: 12px;
+                  border: 1.5px solid var(--border);
+                  border-radius: 10px;
+                  background: var(--card-bg);
+                  color: var(--text-main);
+                  font-size: 14px;
+                  cursor: pointer;
+                "
+              >
+                <option value="+91" selected>🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+81">🇯🇵 +81</option>
+                <option value="+49">🇩🇪 +49</option>
+              </select>
+
+              <input
+                type="tel"
+                id="phoneNumber"
+                placeholder="9876543210"
+                required
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                style="
+                  flex: 1;
+                  padding: 12px 16px;
+                  border: 1.5px solid var(--border);
+                  border-radius: 10px;
+                  background: var(--card-bg);
+                  color: var(--text-main);
+                  font-size: 14px;
+                "
+              />
+            </div>
+            <input type="hidden" name="phone" id="fullPhone" />
+          </div>
+
+          <div class="input-group" style="margin-top: 15px">
+            <label style="font-weight: 600; margin-bottom: 8px; display: block"
+              >Delivery Address</label
+            >
+            <textarea
+              name="address"
+              rows="4"
+              placeholder="Enter your full home or office address..."
+              required
+              style="
+                width: 100%;
+                padding: 12px 16px;
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                background: var(--card-bg);
+                color: var(--text-main);
+                font-family: inherit;
+                resize: vertical;
+              "
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="primary-btn"
+            style="
+              width: 100%;
+              margin-top: 25px;
+              background: #27ae60;
+              font-size: 16px;
+              padding: 14px;
+              border-radius: 10px;
+              color: white;
+              font-weight: bold;
+              border: none;
+              cursor: pointer;
+            "
+          >
+            Place Order (Cash on Delivery)
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <script>
+      // Merge code and number on submit
+      document
+        .getElementById("checkoutForm")
+        .addEventListener("submit", function () {
+          const code = document.getElementById("countryCode").value;
+          const number = document.getElementById("phoneNumber").value;
+          document.getElementById("fullPhone").value = code + " " + number;
+        });
+
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
+
+      function toggleTheme() {
+        const isDark = document.getElementById("theme-checkbox").checked;
+        const theme = isDark ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+      }
+
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      const themeCheckbox = document.getElementById("theme-checkbox");
+      if (themeCheckbox) {
+        themeCheckbox.checked = savedTheme === "dark";
+      }
+    </script>
+  </body>
+</html>

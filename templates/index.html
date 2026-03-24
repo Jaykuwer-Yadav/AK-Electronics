@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store | AK Electronics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="store-body">
+    <nav class="navbar" style="flex-wrap: wrap">
+      <a href="{{ url_for('index') }}" style="text-decoration: none; order: 1">
+        <div
+          class="brand-logo"
+          style="
+            margin: 0;
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 24px;
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <form
+        class="search-form"
+        action="{{ url_for('index') }}"
+        method="GET"
+        style="
+          order: 3;
+          width: 100% !important;
+          margin: 8px 0 0 0 !important;
+          display: flex;
+          gap: 5px;
+        "
+      >
+        <input
+          type="text"
+          name="search"
+          placeholder="Search products..."
+          value="{{ search_query or '' }}"
+          style="
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-color);
+            color: var(--text-main);
+          "
+        />
+        <button
+          type="submit"
+          class="primary-btn"
+          style="width: auto; padding: 10px 15px"
+        >
+          Search
+        </button>
+        {% if search_query %}
+        <a
+          href="{{ url_for('index') }}"
+          class="primary-btn"
+          style="
+            background: #e74c3c;
+            width: auto;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+          >Clear</a
+        >
+        {% endif %}
+      </form>
+
+      <div class="hamburger-menu" onclick="toggleMenu()" style="order: 2">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <div class="nav-content" id="navMenu">
+        <div
+          class="theme-switch-wrapper"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+          "
+        >
+          <label class="theme-switch">
+            <input
+              type="checkbox"
+              id="theme-checkbox"
+              onclick="toggleTheme()"
+            />
+            <div class="slider">
+              <span class="icon moon">🌙</span>
+              <span class="icon sun">☀️</span>
+            </div>
+          </label>
+        </div>
+
+        {% if session.get('user_id') %}
+        <div
+          class="nav-link-wrapper"
+          style="position: relative; display: flex; justify-content: center"
+        >
+          <a
+            href="{{ url_for('cart') }}"
+            class="mobile-nav-link"
+            style="
+              font-weight: 600;
+              text-decoration: none;
+              color: var(--primary);
+            "
+            >🛒 My Cart</a
+          >
+          {% if cart_count and cart_count > 0 %}
+          <span class="cart-badge">{{ cart_count }}</span>
+          {% endif %}
+        </div>
+
+        <a
+          href="{{ url_for('my_orders') }}"
+          class="mobile-nav-link"
+          style="font-weight: 600; text-decoration: none; color: var(--primary)"
+          >📦 My Orders</a
+        >
+        {% endif %} {% if session.get('role') == 'admin' %}
+        <a
+          href="{{ url_for('admin_dashboard') }}"
+          class="mobile-nav-link"
+          style="font-weight: bold; color: #27ae60; text-decoration: none"
+          >⚙️ Admin Panel</a
+        >
+        {% elif session.get('role') == 'developer' %}
+        <a
+          href="{{ url_for('developer_console') }}"
+          class="mobile-nav-link"
+          style="font-weight: bold; color: #e74c3c; text-decoration: none"
+          >🚀 Dev Console</a
+        >
+        {% endif %} {% if session.get('user_id') or session.get('role') %}
+        <a
+          href="{{ url_for('logout') }}"
+          class="mobile-nav-link logout-text"
+          style="color: var(--text-muted); text-decoration: none"
+          >Logout</a
+        >
+        {% else %}
+        <a
+          href="{{ url_for('login') }}"
+          class="primary-btn"
+          style="width: auto; padding: 10px 20px; text-decoration: none"
+          >Login / Register</a
+        >
+        {% endif %}
+      </div>
+    </nav>
+
+    <main class="store-container">
+      {% for category, items in categories.items() %}
+      <div class="category-section">
+        <h2 style="margin: 20px 0">{{ category }}</h2>
+        <div
+          class="product-grid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+          "
+        >
+          {% for item in items %}
+          <div class="product-card">
+            <img
+              src="{{ url_for('static', filename='uploads/' + (item.image_url.split(',')[0] if item.image_url else 'default.png')) }}"
+              class="product-img"
+              style="width: 100%; height: 200px; object-fit: contain"
+            />
+
+            <div class="product-info">
+              <h3>{{ item.name }}</h3>
+              <p
+                style="
+                  color: var(--primary);
+                  font-size: 13px;
+                  font-weight: bold;
+                  margin-bottom: 5px;
+                "
+              >
+                {{ item.sub_category }}
+              </p>
+              <p style="font-size: 14px; color: var(--text-muted)">
+                {{ item.description }}
+              </p>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-top: 15px;
+                "
+              >
+                <p style="font-weight: bold; font-size: 18px">
+                  ₹{{ item.price }}
+                </p>
+
+                <div style="margin-top: 15px; width: 130px">
+                  {% if session.get('user_id') or session.get('role') %} {% if
+                  item.id in cart_dict %}
+                  <div class="qty-control">
+                    <a
+                      href="{{ url_for('decrease_cart', product_id=item.id) }}"
+                      class="qty-btn"
+                      >-</a
+                    >
+                    <span class="qty-val">{{ cart_dict[item.id] }}</span>
+                    <a
+                      href="{{ url_for('add_to_cart', product_id=item.id) }}"
+                      class="qty-btn"
+                      >+</a
+                    >
+                  </div>
+                  {% else %}
+                  <a
+                    href="{{ url_for('add_to_cart', product_id=item.id) }}"
+                    class="primary-btn"
+                    style="
+                      width: 100%;
+                      padding: 8px 15px;
+                      text-decoration: none;
+                      text-align: center;
+                    "
+                    >Add to Cart</a
+                  >
+                  {% endif %} {% else %}
+                  <a
+                    href="{{ url_for('login') }}"
+                    onclick="
+                      alert(
+                        'Please log in or create an account to buy products!',
+                      )
+                    "
+                    class="primary-btn"
+                    style="
+                      width: 100%;
+                      padding: 8px 15px;
+                      text-decoration: none;
+                      background: #e74c3c;
+                      text-align: center;
+                    "
+                    >Add to Cart</a
+                  >
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% else %}
+      <div style="text-align: center; margin-top: 80px">
+        <h3 style="color: var(--text-muted)">No products found.</h3>
+      </div>
+      {% endfor %} {% if session.get('user_id') or session.get('role') %}
+      <div
+        class="category-section"
+        style="
+          margin-top: 50px;
+          padding: 20px;
+          border-radius: 12px;
+          border: 1px solid var(--border);
+          max-width: 420px;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      >
+        <h2
+          style="color: var(--primary); margin-bottom: 15px; text-align: center"
+        >
+          Support Desk
+        </h2>
+        <form
+          action="{{ url_for('submit_request') }}"
+          method="POST"
+          style="display: flex; flex-direction: column; gap: 15px"
+        >
+          <select
+            name="request_type"
+            required
+            style="
+              padding: 10px;
+              border-radius: 8px;
+              border: 1px solid var(--border);
+              background: var(--card-bg);
+              color: var(--text-main);
+            "
+          >
+            <option value="Repair Request">🛠️ Repair Request</option>
+            <option value="Product Request">📦 Product Request</option>
+            <option value="General Question">💬 General Question</option>
+          </select>
+          <textarea
+            name="message"
+            rows="3"
+            placeholder="Describe what you need..."
+            required
+            style="
+              padding: 10px;
+              border-radius: 8px;
+              border: 1px solid var(--border);
+              background: var(--card-bg);
+              color: var(--text-main);
+            "
+          ></textarea>
+          <button type="submit" class="primary-btn" style="width: auto">
+            Send to Admin
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </main>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCjHh_aQXHVEcHC4RHNMmdP-y4ypkb6vZA",
+        authDomain: "ak-electronics-871a7.firebaseapp.com",
+        projectId: "ak-electronics-871a7",
+        storageBucket: "ak-electronics-871a7.firebasestorage.app",
+        messagingSenderId: "485989921842",
+        appId: "1:485989921842:web:a207a9ef2276db0715f82b"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      console.log("🔥 Firebase initialized in frontend!");
+    </script>
+
+    <script>
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
+
+      function toggleTheme() {
+        const checkbox = document.getElementById("theme-checkbox");
+        let newTheme = checkbox.checked ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+      }
+
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      const themeCheckbox = document.getElementById("theme-checkbox");
+      if (themeCheckbox) {
+        themeCheckbox.checked = savedTheme === "dark";
+      }
+    </script>
+  </body>
+</html>

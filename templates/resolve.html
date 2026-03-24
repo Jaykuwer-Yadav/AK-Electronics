@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resolve Request | AK Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .resolve-container { max-width: 600px; margin: 50px auto; padding: 30px; }
+    .query-box { background: var(--bg-color); padding: 15px; border-radius: 10px; border-left: 4px solid #e74c3c; margin-bottom: 20px; }
+  </style>
+</head>
+<body class="store-body">
+  <nav class="navbar">
+    <div class="brand-logo" style="font-weight: bold; font-size: 24px;">AK <span style="color: #27ae60">Admin</span></div>
+    <a href="{{ url_for('admin_dashboard') }}" style="color: var(--text-main); font-weight: 600; text-decoration: none;">← Back to Dashboard</a>
+  </nav>
+
+  <div class="resolve-container admin-card">
+    <h2>🛠️ Resolve Customer Issue</h2>
+    
+    <div class="query-box">
+      <small style="color: var(--text-muted);">User #{{ req.user_id }} | {{ req.request_type }}</small>
+      <p style="margin-top: 10px; font-weight: 500;">"{{ req.message }}"</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="input-group">
+        <label>Admin Reply / Resolution Message</label>
+        <textarea name="admin_reply" rows="4" placeholder="Type your solution here..." required></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Attach Solution Image (Optional)</label>
+        <input type="file" name="reply_image" accept="image/*">
+      </div>
+
+      <button type="submit" class="primary-btn" style="width: 100%; background: #27ae60;">Mark as Resolved & Send Reply</button>
+    </form>
+  </div>
+</body>
+</html>

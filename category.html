@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ category }} | AK Electronics</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="store-body">
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" style="text-decoration: none">
+        <div class="brand-logo" style="margin: 0; color: var(--text-main)">
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+      <div style="display: flex; gap: 20px; align-items: center">
+        <a
+          href="{{ url_for('home') }}"
+          style="
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+          "
+          >Back to Store</a
+        >
+        <a
+          href="{{ url_for('cart') }}"
+          style="color: var(--primary); font-weight: 600; text-decoration: none"
+          >🛒 My Cart</a
+        >
+      </div>
+    </nav>
+
+    <main class="store-container">
+      <h2 class="category-title">All {{ category }}</h2>
+      <div class="product-grid">
+        {% for item in products %}
+        <div class="product-card">
+          <img
+            src="{{ url_for('static', filename='uploads/' + item.image_url) }}"
+            alt="{{ item.name }}"
+            class="product-img"
+          />
+          <div class="product-info">
+            <h3>{{ item.name }}</h3>
+            <p class="desc">{{ item.description }}</p>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 15px;
+              "
+            >
+              <p class="price">₹{{ item.price }}</p>
+              <a
+                href="{{ url_for('add_to_cart', product_id=item.id) }}"
+                class="primary-btn"
+                style="width: auto; padding: 8px 15px; text-decoration: none"
+                >Add to Cart</a
+              >
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; margin-top: 80px; grid-column: 1 / -1">
+          <h3 style="color: var(--text-muted)">
+            No products found in {{ category }}.
+          </h3>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+
+    <script>
+      document.documentElement.setAttribute(
+        "data-theme",
+        localStorage.getItem("theme") || "light",
+      );
+    </script>
+  </body>
+</html>

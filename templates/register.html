@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account | AK Electronics</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="auth-page">
+    <div class="auth-card">
+      <a href="{{ url_for('index') }}" style="text-decoration: none">
+        <div
+          class="brand-logo"
+          style="
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: var(--text-main);
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <h1 style="margin-bottom: 10px">Create an account</h1>
+      <p style="color: var(--text-muted); margin-bottom: 30px">
+        Join AK Electronics for repairs and easy shopping.
+      </p>
+
+      <form action="{{ url_for('register') }}" method="POST">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" name="username" placeholder="e.g. Jay" required />
+        </div>
+        <div class="input-group">
+          <label>Email address</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="e.g. jay@gmail.com"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="button" id="regBtn" class="primary-btn" style="margin-top: 10px">
+          Register Now
+        </button>
+      </form>
+
+      <div id="error-msg" style="color: #e74c3c; margin-top: 15px; text-align: center; font-size: 14px; display: none;"></div>
+
+      <div style="margin-top: 25px; text-align: center; font-size: 14px">
+        <p style="color: var(--text-muted)">
+          Already have an account?
+          <a
+            href="{{ url_for('login') }}"
+            style="
+              color: var(--primary);
+              font-weight: bold;
+              text-decoration: none;
+            "
+            >Sign in here</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCjHh_aQXHVEcHC4RHNMmdP-y4ypkb6vZA",
+        authDomain: "ak-electronics-871a7.firebaseapp.com",
+        projectId: "ak-electronics-871a7",
+        storageBucket: "ak-electronics-871a7.firebasestorage.app",
+        messagingSenderId: "485989921842",
+        appId: "1:485989921842:web:a207a9ef2276db0715f82b"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document.getElementById('regBtn').addEventListener('click', async () => {
+        const username = document.getElementsByName('username')[0].value;
+        const email = document.getElementsByName('email')[0].value;
+        const password = document.getElementsByName('password')[0].value;
+        const errorDiv = document.getElementById('error-msg');
+        errorDiv.style.display = 'none';
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(userCredential.user, { displayName: username });
+          
+          window.location.href = '/login';
+        } catch (error) {
+          errorDiv.innerText = error.message;
+          errorDiv.style.display = 'block';
+        }
+      });
+    </script>
+  </body>
+</html>

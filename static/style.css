@@ -1,0 +1,358 @@
+/* --- 1. DYNAMIC THEME VARIABLES --- */
+:root {
+  --primary: #003366;
+  --bg-color: #f8f9fa;
+  --text-main: #1a1a1a;
+  --text-muted: #666;
+  --card-bg: #ffffff;
+  --border: #e1e1e1;
+}
+
+[data-theme="dark"] {
+  --primary: #4da6ff;
+  --bg-color: #121212;
+  --text-main: #ffffff;
+  --text-muted: #aaaaaa;
+  --card-bg: #1e1e1e;
+  --border: #333333;
+}
+
+/* --- 2. GLOBAL RESET & SCROLL FIX --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto !important;
+  overflow-x: hidden !important; /* CRITICAL FIX: Stops anything from going off the right side */
+  width: 100%;
+}
+
+/* --- 3. NAVIGATION (Desktop Default > 768px) --- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  padding: 12px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+
+/* Forces Logo Left, Search Middle, Nav Right on Desktop */
+.brand-logo {
+  order: 1;
+}
+.search-form {
+  order: 2;
+  flex: 1;
+  max-width: 500px;
+  display: flex;
+  gap: 5px;
+}
+.nav-content {
+  order: 3;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.hamburger-menu {
+  display: none;
+}
+
+.store-body {
+  padding-top: 90px !important;
+}
+
+/* --- 4. HAMBURGER ICON (Mobile Only) --- */
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: var(--text-main);
+  border-radius: 2px;
+  transition: 0.3s;
+  margin-bottom: 4px;
+}
+
+/* --- 5. UI CARDS --- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-color) 0%, var(--border) 100%);
+  padding: 20px;
+}
+
+.auth-card,
+.admin-card,
+.support-card,
+.product-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.product-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* --- 6. INPUTS & BUTTONS --- */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea,
+.search-form input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px; /* Pill shape */
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.input-group input:focus,
+.search-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.primary-btn {
+  background: var(--primary);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px; /* Pill shape */
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+  white-space: nowrap;
+}
+
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+/* --- 7. PILL THEME TOGGLE --- */
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.theme-switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333;
+  transition: 0.4s;
+  border-radius: 34px;
+  border: 1px solid var(--border);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background-color: var(--primary);
+}
+input:checked + .slider:before {
+  transform: translateX(25px);
+}
+
+.slider .icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+}
+.slider .sun {
+  right: 8px;
+}
+.slider .moon {
+  left: 8px;
+  opacity: 0.3;
+}
+input:checked + .slider .moon {
+  opacity: 1;
+}
+input:checked + .slider .sun {
+  opacity: 0.3;
+}
+
+/* --- 8. MOBILE PLACEMENT (< 768px) --- */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 8px 15px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+  }
+
+  /* LOGO: Locked Hard Left */
+  .brand-logo {
+    order: 1 !important;
+    flex: 1 !important;
+    text-align: left !important;
+  }
+
+  /* HAMBURGER MENU: Locked Hard Right */
+  .hamburger-menu {
+    order: 2 !important;
+    display: flex !important;
+    margin-left: auto !important;
+    margin-top: 5px;
+  }
+
+  /* SEARCH BAR: Pinned Bottom Center */
+  .search-form {
+    order: 3 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px 0 2px 0 !important;
+  }
+
+  /* DRAWER MENU: Cannot go off-screen right */
+  .nav-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 15px !important; /* Forces it to stay 15px away from the right edge */
+    width: max-content;
+    min-width: 160px;
+    max-width: calc(
+      100vw - 30px
+    ); /* Physically impossible to exceed screen width */
+    background: var(--card-bg);
+    flex-direction: column;
+    align-items: flex-end; /* Aligns text to the right inside the box */
+    padding: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    z-index: 2000;
+  }
+
+  .nav-content.active {
+    display: flex !important;
+    gap: 15px;
+  }
+
+  /* Link styling inside mobile drawer */
+  .mobile-nav-link,
+  .primary-btn {
+    width: 100%;
+    text-align: right;
+  }
+
+  /* Final Top Padding adjustment (Hits the 289 target) */
+  .store-body {
+    padding-top: 110px !important;
+  }
+}
+
+/* --- 9. EXTRA TIGHT MOBILE (420px) --- */
+@media (max-width: 420px) {
+  .brand-logo {
+    font-size: 18px !important;
+  }
+  .navbar {
+    padding: 6px 10px !important;
+  }
+  .store-body {
+    padding-top: 105px !important;
+  }
+}
+/* --- CART BADGE & QUANTITY CONTROLS --- */
+.nav-link-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-badge {
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 11px;
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-color);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 15px;
+  width: 100%;
+}
+
+.qty-btn {
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0 10px;
+  user-select: none;
+}
+
+.qty-val {
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--text-main);
+}

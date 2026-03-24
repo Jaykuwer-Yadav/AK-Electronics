@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev Console | AK Electronics</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="store-body">
+    <nav class="navbar">
+      <a href="{{ url_for('index') }}" style="text-decoration: none">
+        <div
+          class="brand-logo"
+          style="color: var(--text-main); font-weight: bold"
+        >
+          AK <span style="color: #e74c3c">Developer</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a
+          href="{{ url_for('index') }}"
+          style="text-decoration: none; font-weight: 600"
+          >Back to Store</a
+        >
+        <a
+          href="{{ url_for('logout') }}"
+          style="color: var(--text-muted); text-decoration: none"
+          >Logout</a
+        >
+      </div>
+    </nav>
+
+    <div class="store-container">
+      <div class="admin-card" style="background: #1a1a1a; color: white">
+        <h1 style="color: #e74c3c">🚀 System Developer Console</h1>
+        <p>
+          Database inspection enabled. Code editor is available on desktop view.
+        </p>
+      </div>
+
+      <div class="admin-card">
+        <h2>👥 Registered Users</h2>
+        <div class="table-container">
+          <table style="min-width: 100%; border-collapse: collapse">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border)">
+                <th style="padding: 10px; text-align: left">S.No</th>
+                <th style="padding: 10px; text-align: left">Username</th>
+                <th style="padding: 10px; text-align: left">Email Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in users %}
+              <tr style="border-bottom: 1px solid var(--border)">
+                <td style="padding: 10px">{{ loop.index }}</td>
+                <td style="padding: 10px; font-weight: bold">
+                  {{ u.username }}
+                </td>
+                <td style="padding: 10px; color: var(--primary)">
+                  {{ u.email }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="desktop-only-editor">
+        <div class="admin-card">
+          <h2>💻 Live Code Editor (index.html)</h2>
+          <form action="{{ url_for('edit_file') }}" method="POST">
+            <input type="hidden" name="filename" value="templates/index.html" />
+            <textarea
+              name="code"
+              style="
+                font-family: monospace;
+                height: 400px;
+                width: 100%;
+                background: #1e1e1e;
+                color: #dcdcdc;
+                padding: 15px;
+                border-radius: 10px;
+              "
+            >
+{{ home_code }}</textarea
+            >
+            <button
+              type="submit"
+              class="primary-btn"
+              style="background: #e74c3c; margin-top: 15px"
+            >
+              Push Changes to Live
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.documentElement.setAttribute(
+        "data-theme",
+        localStorage.getItem("theme") || "light",
+      );
+    </script>
+  </body>
+</html>

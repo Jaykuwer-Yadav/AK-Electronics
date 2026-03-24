@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In | AK Electronics</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="auth-page">
+    <div class="auth-card">
+      <a href="{{ url_for('index') }}" style="text-decoration: none">
+        <div
+          class="brand-logo"
+          style="
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: var(--text-main);
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <h1 style="margin-bottom: 10px">Sign in to account</h1>
+      <p style="color: var(--text-muted); margin-bottom: 30px">
+        Welcome back! Please enter your details.
+      </p>
+
+      <form action="{{ url_for('login') }}" method="POST">
+        <div class="input-group">
+          <label>Email address</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="e.g. jay@gmail.com"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="button" id="loginBtn" class="primary-btn" style="margin-top: 10px">
+          Sign In
+        </button>
+      </form>
+
+      <div id="error-msg" style="color: #e74c3c; margin-top: 15px; text-align: center; font-size: 14px; display: none;"></div>
+
+      <div style="margin-top: 25px; text-align: center; font-size: 14px">
+        <p style="color: var(--text-muted)">
+          By signing in, you agree to our
+          <a href="#" style="color: var(--primary)">Terms of Service</a> and
+          <a href="#" style="color: var(--primary)">Privacy Policy</a>.
+        </p>
+        <p style="margin-top: 20px">
+          New to AK?
+          <a
+            href="{{ url_for('register') }}"
+            style="
+              color: var(--primary);
+              font-weight: bold;
+              text-decoration: none;
+            "
+            >Create an account</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCjHh_aQXHVEcHC4RHNMmdP-y4ypkb6vZA",
+        authDomain: "ak-electronics-871a7.firebaseapp.com",
+        projectId: "ak-electronics-871a7",
+        storageBucket: "ak-electronics-871a7.firebasestorage.app",
+        messagingSenderId: "485989921842",
+        appId: "1:485989921842:web:a207a9ef2276db0715f82b"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document.getElementById('loginBtn').addEventListener('click', async () => {
+        const email = document.getElementsByName('email')[0].value;
+        const password = document.getElementsByName('password')[0].value;
+        const errorDiv = document.getElementById('error-msg');
+        errorDiv.style.display = 'none';
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const idToken = await userCredential.user.getIdToken();
+          
+          const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+          });
+
+          if (response.ok) {
+            window.location.href = '/';
+          } else {
+            const errText = await response.text();
+            errorDiv.innerText = "Error: " + errText;
+            errorDiv.style.display = 'block';
+          }
+        } catch (error) {
+          errorDiv.innerText = error.message;
+          errorDiv.style.display = 'block';
+        }
+      });
+    </script>
+  </body>
+</html>

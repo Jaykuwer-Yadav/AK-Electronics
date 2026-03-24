@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Cart | AK Electronics</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      .cart-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .cart-item-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+      .cart-item-details {
+        flex: 1;
+        min-width: 150px;
+      }
+      .cart-summary {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        text-align: right;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body class="store-body">
+    <nav class="navbar">
+      <a href="{{ url_for('index') }}" style="text-decoration: none">
+        <div
+          class="brand-logo"
+          style="
+            font-weight: bold;
+            font-size: 24px;
+            color: var(--text-main);
+            margin: 0;
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <form class="search-form" action="{{ url_for('index') }}" method="GET">
+        <input type="text" name="search" placeholder="Search products..." />
+        <button type="submit" class="primary-btn">Search</button>
+      </form>
+
+      <div class="nav-content" id="navMenu">
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="slider">
+            <span class="icon sun">☀️</span>
+            <span class="icon moon">🌙</span>
+          </span>
+        </label>
+
+        <a
+          href="{{ url_for('cart') }}"
+          class="mobile-nav-link"
+          style="
+            color: var(--text-main);
+            font-weight: 600;
+            text-decoration: none;
+          "
+          >🛒 My Cart</a
+        >
+
+        {% if session.get('user_id') %}
+        <a
+          href="{{ url_for('logout') }}"
+          class="mobile-nav-link"
+          style="color: var(--text-muted); text-decoration: none"
+          >Logout</a
+        >
+        {% else %}
+        <a
+          href="{{ url_for('login') }}"
+          class="mobile-nav-link"
+          style="color: var(--text-muted); text-decoration: none"
+          >Login</a
+        >
+        {% endif %}
+      </div>
+
+      <div class="hamburger-menu" id="hamburger">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </nav>
+
+    <div class="cart-container">
+      <h2 style="margin-bottom: 20px">🛒 My Shopping Cart</h2>
+
+      {% if items %} {% for item in items %}
+      <div class="cart-item">
+        <img
+          src="{{ url_for('static', filename='uploads/' + item.product.image_url.split(',')[0]) }}"
+          class="cart-item-img"
+        />
+
+        <div class="cart-item-details">
+          <h3 style="font-size: 16px; margin-bottom: 5px">
+            {{ item.product.name }}
+          </h3>
+          <p style="color: var(--primary); font-weight: bold">
+            ₹{{ item.product.price }}
+          </p>
+        </div>
+
+        <div style="width: 130px">
+          <div class="qty-control">
+            <a
+              href="{{ url_for('decrease_cart', product_id=item.product_id) }}"
+              class="qty-btn"
+              >-</a
+            >
+            <span class="qty-val">{{ item.quantity }}</span>
+            <a
+              href="{{ url_for('add_to_cart', product_id=item.product_id) }}"
+              class="qty-btn"
+              >+</a
+            >
+          </div>
+        </div>
+
+        <a
+          href="{{ url_for('remove_cart', item_id=item.id) }}"
+          style="
+            color: #e74c3c;
+            font-size: 20px;
+            text-decoration: none;
+            padding: 10px;
+          "
+          >🗑️</a
+        >
+      </div>
+      {% endfor %}
+
+      <div class="cart-summary">
+        <h3>Total: <span style="color: var(--primary)">₹{{ total }}</span></h3>
+        <a
+          href="{{ url_for('checkout') }}"
+          class="primary-btn"
+          style="
+            margin-top: 15px;
+            width: 100%;
+            max-width: 300px;
+            background: #27ae60;
+          "
+          >Proceed to Checkout</a
+        >
+      </div>
+
+      {% else %}
+      <div
+        style="
+          text-align: center;
+          padding: 50px;
+          background: var(--card-bg);
+          border-radius: 10px;
+          border: 1px solid var(--border);
+        "
+      >
+        <h3 style="color: var(--text-muted); margin-bottom: 15px">
+          Your cart is empty 😢
+        </h3>
+        <a href="{{ url_for('index') }}" class="primary-btn"
+          >Continue Shopping</a
+        >
+      </div>
+      {% endif %}
+    </div>
+
+    <script>
+      // Theme Toggle Logic
+      const themeToggle = document.getElementById("theme-toggle");
+      const currentTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", currentTheme);
+      if (currentTheme === "dark") themeToggle.checked = true;
+
+      themeToggle.addEventListener("change", function () {
+        const newTheme = this.checked ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+      });
+
+      // Mobile Hamburger Menu Logic
+      const hamburger = document.getElementById("hamburger");
+      const navMenu = document.getElementById("navMenu");
+      hamburger.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>

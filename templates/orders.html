@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders | AK Electronics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      .order-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+      .track-badge {
+        background: var(--bg-color);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-weight: bold;
+        border: 1px dashed var(--primary);
+      }
+    </style>
+  </head>
+  <body class="store-body">
+    <nav class="navbar" style="flex-wrap: wrap">
+      <a href="{{ url_for('index') }}" style="text-decoration: none; order: 1">
+        <div
+          class="brand-logo"
+          style="
+            margin: 0;
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 24px;
+          "
+        >
+          AK <span style="color: var(--primary)">Electronics</span>
+        </div>
+      </a>
+
+      <div class="hamburger-menu" onclick="toggleMenu()" style="order: 2">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+
+      <div class="nav-content" id="navMenu">
+        <div
+          class="theme-switch-wrapper"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+          "
+        >
+          <label class="theme-switch">
+            <input
+              type="checkbox"
+              id="theme-checkbox"
+              onclick="toggleTheme()"
+            />
+            <div class="slider">
+              <span class="icon moon">🌙</span>
+              <span class="icon sun">☀️</span>
+            </div>
+          </label>
+        </div>
+        <a
+          href="{{ url_for('index') }}"
+          class="mobile-nav-link"
+          style="
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-main);
+          "
+          >🏠 Home</a
+        >
+        <a
+          href="{{ url_for('cart') }}"
+          class="mobile-nav-link"
+          style="
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-main);
+          "
+          >🛒 My Cart</a
+        >
+        <a
+          href="{{ url_for('logout') }}"
+          class="mobile-nav-link logout-text"
+          style="color: var(--text-muted); text-decoration: none"
+          >Logout</a
+        >
+      </div>
+    </nav>
+
+    <main
+      class="store-container"
+      style="max-width: 700px; margin: 0 auto; padding: 20px"
+    >
+      <h2 style="margin-bottom: 25px; text-align: center">📦 My Orders</h2>
+
+      {% if orders %} {% for order in orders %}
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <p style="color: var(--text-muted); font-size: 13px">Order ID</p>
+            <p style="font-weight: bold; font-size: 18px">#{{ order.id }}</p>
+          </div>
+          <div style="text-align: right">
+            <p style="color: var(--text-muted); font-size: 13px">
+              Total Amount
+            </p>
+            <p
+              style="font-weight: bold; color: var(--primary); font-size: 18px"
+            >
+              ₹{{ order.total_amount }}
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px">
+          <p style="font-size: 15px; margin-bottom: 10px">
+            <strong>Status:</strong>
+            {% if order.status == 'Processing' %}
+            <span
+              style="
+                color: #e67e22;
+                font-weight: bold;
+                background: #fdf2e9;
+                padding: 4px 10px;
+                border-radius: 12px;
+              "
+              >⏳ {{ order.status }}</span
+            >
+            {% elif order.status == 'Shipped' %}
+            <span
+              style="
+                color: #3498db;
+                font-weight: bold;
+                background: #ebf5fb;
+                padding: 4px 10px;
+                border-radius: 12px;
+              "
+              >🚚 {{ order.status }}</span
+            >
+            {% elif order.status == 'Delivered' %}
+            <span
+              style="
+                color: #27ae60;
+                font-weight: bold;
+                background: #e9f7ef;
+                padding: 4px 10px;
+                border-radius: 12px;
+              "
+              >✅ {{ order.status }}</span
+            >
+            {% else %}
+            <span
+              style="
+                color: var(--text-main);
+                font-weight: bold;
+                background: var(--border);
+                padding: 4px 10px;
+                border-radius: 12px;
+              "
+              >{{ order.status }}</span
+            >
+            {% endif %}
+          </p>
+          <p style="font-size: 14px">
+            <strong>Tracking ID:</strong>
+            <span class="track-badge">{{ order.tracking_number }}</span>
+          </p>
+        </div>
+
+        <div
+          style="
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+          "
+        >
+          <p
+            style="
+              font-size: 13px;
+              color: var(--text-muted);
+              margin-bottom: 5px;
+            "
+          >
+            Delivery Details:
+          </p>
+          <p style="font-size: 14px; font-family: monospace">
+            {{ order.delivery_address }}
+          </p>
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <div
+        style="
+          text-align: center;
+          padding: 50px;
+          background: var(--card-bg);
+          border-radius: 10px;
+          border: 1px solid var(--border);
+        "
+      >
+        <h3 style="color: var(--text-muted); margin-bottom: 15px">
+          You haven't placed any orders yet.
+        </h3>
+        <a
+          href="{{ url_for('index') }}"
+          class="primary-btn"
+          style="text-decoration: none"
+          >Start Shopping</a
+        >
+      </div>
+      {% endif %}
+    </main>
+
+    <script>
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
+
+      function toggleTheme() {
+        const isDark = document.getElementById("theme-checkbox").checked;
+        const theme = isDark ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+      }
+
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      const themeCheckbox = document.getElementById("theme-checkbox");
+      if (themeCheckbox) {
+        themeCheckbox.checked = savedTheme === "dark";
+      }
+    </script>
+  </body>
+</html>
