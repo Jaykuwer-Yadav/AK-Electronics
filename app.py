@@ -26,8 +26,18 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 db = SQLAlchemy(app)
 
 # --- 🎯 FIREBASE ADMIN SDK ---
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
+import json
+firebase_key_path = "firebase_key.json"
+if os.path.exists(firebase_key_path):
+    cred = credentials.Certificate(firebase_key_path)
+    firebase_admin.initialize_app(cred)
+elif os.environ.get("FIREBASE_KEY"):
+    key_dict = json.loads(os.environ.get("FIREBASE_KEY"))
+    cred = credentials.Certificate(key_dict)
+    firebase_admin.initialize_app(cred)
+else:
+    print("⚠️ Firebase Key not found. Backend features may fail.")
+
 fb_db = firestore.client()
 print("✅ Firebase Admin initialized successfully!")
 
