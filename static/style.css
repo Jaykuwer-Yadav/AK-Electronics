@@ -61,7 +61,7 @@ h1, h2, h3, .brand-logo {
 
 /* --- GLASS MORPHISM NAVBAR --- */
 .navbar {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
@@ -75,6 +75,7 @@ h1, h2, h3, .brand-logo {
     z-index: 1000;
     border-bottom: 1px solid var(--glass-border);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    gap: 20px;
 }
 
 .brand-logo {
@@ -96,13 +97,23 @@ h1, h2, h3, .brand-logo {
 /* --- SEARCH BAR --- */
 .search-form {
     flex: 1;
-    max-width: 600px;
-    margin: 0 2rem;
+    max-width: 500px;
     display: flex;
     background: rgba(0, 0, 0, 0.05);
     padding: 4px;
     border-radius: 50px;
     border: 1px solid var(--border);
+    order: 2; /* Desktop: Middle */
+}
+
+.search-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-main);
+    order: 3; /* Mobile: Right */
 }
 
 [data-theme="dark"] .search-form {
@@ -184,6 +195,18 @@ h1, h2, h3, .brand-logo {
 input:checked + .slider {
     transform: translateX(24px);
     background: var(--bg-color);
+}
+
+.slider .icon {
+    display: none;
+}
+
+.theme-switch input:not(:checked) + .slider .moon {
+    display: block;
+}
+
+.theme-switch input:checked + .slider .sun {
+    display: block;
 }
 
 /* --- HERO SECTION --- */
@@ -378,24 +401,37 @@ input:checked + .slider {
 
 /* --- QUANTITY CONTROLS --- */
 .qty-control {
-    background: var(--bg-color);
-    border: 1px solid var(--border);
-    border-radius: 50px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
     padding: 4px;
-    gap: 10px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    gap: 12px;
+    min-width: 100px;
 }
 
 .qty-btn {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
-    background: var(--card-bg);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: var(--card-bg);
+    color: var(--text-main);
     text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.qty-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+.qty-val {
     color: var(--text-main);
     font-weight: 800;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -435,9 +471,28 @@ input:checked + .slider {
 }
 
 @media (max-width: 768px) {
-    .navbar { padding: 0.8rem 1rem; }
-    .search-form { display: none; }
-    .hero-banner { height: 300px; padding: 0 5%; border-radius: 20px; }
+    .navbar { 
+        padding: 0.8rem 1rem; 
+        flex-wrap: wrap; 
+        justify-content: space-between;
+    }
+    
+    .brand-logo { order: 2; flex: 1; justify-content: center; }
+    .hamburger-menu { order: 1; display: flex; margin-right: 15px; }
+    .search-toggle { display: block; order: 3; }
+    
+    .search-form { 
+        order: 4; 
+        width: 100%; 
+        margin: 10px 0 0 0; 
+        display: none; 
+    }
+    .search-form.active { display: flex; }
+    
+    .store-container { padding-top: 100px; }
+    .store-container.search-active { padding-top: 160px; }
+    
+    .hero-banner { height: auto; padding: 4rem 5%; border-radius: 0; }
     .hero-content h1 { font-size: 2.2rem; }
     
     .hamburger-menu { display: flex; }

@@ -14,94 +14,46 @@
     />
   </head>
   <body class="store-body">
-    <nav class="navbar" style="flex-wrap: wrap">
-      <a href="{{ url_for('index') }}" style="text-decoration: none; order: 1">
-        <div
-          class="brand-logo"
-          style="
-            margin: 0;
-            color: var(--text-main);
-            font-weight: bold;
-            font-size: 24px;
-          "
-        >
-          AK <span style="color: var(--primary)">Electronics</span>
-        </div>
+    <nav class="navbar">
+      <!-- 1. Logo (Left desktop, Center mobile) -->
+      <a href="{{ url_for('index') }}" class="brand-logo" style="order: 1">
+        AK <span>Electronics</span>
       </a>
 
+      <!-- 2. Search (Middle desktop, Hidden/Dropdown mobile) -->
       <form
         class="search-form"
+        id="searchForm"
         action="{{ url_for('index') }}"
         method="GET"
-        style="
-          order: 3;
-          width: 100% !important;
-          margin: 8px 0 0 0 !important;
-          display: flex;
-          gap: 5px;
-        "
       >
         <input
           type="text"
           name="search"
-          placeholder="Search products..."
+          placeholder="Search items..."
           value="{{ search_query or '' }}"
-          style="
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-color);
-            color: var(--text-main);
-          "
         />
-        <button
-          type="submit"
-          class="primary-btn"
-          style="width: auto; padding: 10px 15px"
-        >
-          Search
-        </button>
+        <button type="submit" class="primary-btn" style="width: auto; padding: 10px 15px">Search</button>
         {% if search_query %}
-        <a
-          href="{{ url_for('index') }}"
-          class="primary-btn"
-          style="
-            background: #e74c3c;
-            width: auto;
-            padding: 10px 15px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          "
-          >Clear</a
-        >
+        <a href="{{ url_for('index') }}" class="primary-btn" style="background: #e74c3c; width: auto; padding: 10px 15px; text-decoration: none;">Clear</a>
         {% endif %}
       </form>
 
-      <div class="hamburger-menu" onclick="toggleMenu()" style="order: 2">
+      <!-- 3. Mobile Search Toggle (Right/After Logo mobile) -->
+      <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
+
+      <!-- 4. Hamburger (Left mobile) -->
+      <div class="hamburger-menu" onclick="toggleMenu()">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
 
-      <div class="nav-content" id="navMenu">
-        <div
-          class="theme-switch-wrapper"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 0;
-          "
-        >
+      <!-- 5. Nav Content (Right desktop, Side menu mobile) -->
+      <div class="nav-content" id="navMenu" style="order: 3">
+        <div class="theme-switch-wrapper">
           <label class="theme-switch">
-            <input
-              type="checkbox"
-              id="theme-checkbox"
-              onclick="toggleTheme()"
-            />
+            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
             <div class="slider">
               <span class="icon moon">🌙</span>
               <span class="icon sun">☀️</span>
@@ -110,59 +62,20 @@
         </div>
 
         {% if session.get('user_id') %}
-        <div
-          class="nav-link-wrapper"
-          style="position: relative; display: flex; justify-content: center"
-        >
-          <a
-            href="{{ url_for('cart') }}"
-            class="mobile-nav-link"
-            style="
-              font-weight: 600;
-              text-decoration: none;
-              color: var(--primary);
-            "
-            >🛒 My Cart</a
-          >
-          {% if cart_count and cart_count > 0 %}
-          <span class="cart-badge">{{ cart_count }}</span>
-          {% endif %}
-        </div>
+          <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 Cart {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
+          <a href="{{ url_for('my_orders') }}" class="mobile-nav-link">📦 Orders</a>
+        {% endif %}
 
-        <a
-          href="{{ url_for('my_orders') }}"
-          class="mobile-nav-link"
-          style="font-weight: 600; text-decoration: none; color: var(--primary)"
-          >📦 My Orders</a
-        >
-        {% endif %} {% if session.get('role') == 'admin' %}
-        <a
-          href="{{ url_for('admin_dashboard') }}"
-          class="mobile-nav-link"
-          style="font-weight: bold; color: #27ae60; text-decoration: none"
-          >⚙️ Admin Panel</a
-        >
+        {% if session.get('role') == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link" style="color: #27ae60">⚙️ Admin</a>
         {% elif session.get('role') == 'developer' %}
-        <a
-          href="{{ url_for('developer_console') }}"
-          class="mobile-nav-link"
-          style="font-weight: bold; color: #e74c3c; text-decoration: none"
-          >🚀 Dev Console</a
-        >
-        {% endif %} {% if session.get('user_id') or session.get('role') %}
-        <a
-          href="{{ url_for('logout') }}"
-          class="mobile-nav-link logout-text"
-          style="color: var(--text-muted); text-decoration: none"
-          >Logout</a
-        >
+          <a href="{{ url_for('developer_console') }}" class="mobile-nav-link" style="color: #e74c3c">🚀 Dev</a>
+        {% endif %}
+
+        {% if session.get('user_id') or session.get('role') %}
+          <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
         {% else %}
-        <a
-          href="{{ url_for('login') }}"
-          class="primary-btn"
-          style="width: auto; padding: 10px 20px; text-decoration: none"
-          >Login / Register</a
-        >
+          <a href="{{ url_for('login') }}" class="primary-btn" style="width: auto; padding: 10px 20px; text-decoration: none">Login</a>
         {% endif %}
       </div>
     </nav>
@@ -277,6 +190,13 @@
     <script>
       function toggleMenu() {
         document.getElementById("navMenu").classList.toggle("active");
+      }
+
+      function toggleSearch() {
+        const searchForm = document.getElementById("searchForm");
+        const storeContainer = document.querySelector(".store-container");
+        searchForm.classList.toggle("active");
+        storeContainer.classList.toggle("search-active");
       }
 
       function toggleTheme() {
