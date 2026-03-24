@@ -128,30 +128,27 @@ with app.app_context():
 # --- PUBLIC STOREFRONT (FIRESTORE) ---
 @app.route("/")
 def index():
-    search_query = request.args.get("search", "").strip()
+    # Get Search & Category filters
+    search_query = request.args.get("search", "").lower()
     
-    # Fetch from Firestore
-    products_ref = fb_db.collection("products")
-    if search_query:
-        # Note: Firestore text search is limited, using basic filter for now
-        # For full text search, Algolia or similar is usually used.
-        # Here we'll just fetch all and filter in Python for simplicity.
-        all_docs = products_ref.stream()
-        products = []
-        for doc in all_docs:
-            p = doc.to_dict()
-            p['id'] = doc.id
-            if (search_query.lower() in p.get('name', '').lower() or 
-                search_query.lower() in p.get('category', '').lower() or
-                search_query.lower() in p.get('description', '').lower()):
-                products.append(p)
+    products = []
+    if fb_db:
+        products_ref = fb_db.collection("products")
+        if search_query:
+            # Firestore doesn't support easy case-insensitive search without extensions
+            # So we fetch all and filter in Python for now
+            docs = products_ref.get()
+            products = []
+            for d in docs:
+                p = d.to_dict()
+                p["id"] = d.id
+                if search_query in p.get("name", "").lower() or search_query in p.get("description", "").lower():
+                    products.append(p)
+        else:
+            docs = products_ref.get()
+            products = [dict(d.to_dict(), id=d.id) for d in docs]
     else:
-        all_docs = products_ref.stream()
-        products = []
-        for doc in all_docs:
-            p = doc.to_dict()
-            p['id'] = doc.id
-            products.append(p)
+        print("⚠️ fb_db is None, cannot fetch products.")
 
     categories = {}
     for p in products:
@@ -277,17 +274,18 @@ def cart():
     # Fetch product details from Firestore for each cart item
     cart_display_items = []
     total = 0
-    for item in items:
-        p_doc = fb_db.collection("products").document(item.product_id).get()
-        if p_doc.exists:
-            p_data = p_doc.to_dict()
-            p_data['id'] = p_doc.id
-            cart_display_items.append({
-                'item': item,
-                'product': p_data
-            })
-            total += p_data.get('price', 0) * item.quantity
-            
+    if fb_db:
+        for item in items:
+            p_doc = fb_db.collection("products").document(item.product_id).get()
+            if p_doc.exists:
+                p_data = p_doc.to_dict()
+                p_data['id'] = p_doc.id
+                cart_display_items.append({
+                    'item': item,
+                    'product': p_data
+                })
+                total += p_data.get('price', 0) * item.quantity
+    
     return render_template("cart.html", items=cart_display_items, total=total)
 
 
