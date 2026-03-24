@@ -4,177 +4,179 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | AK Electronics</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    
     <style>
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0 15px;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        background: var(--bg-color);
-        color: var(--text-main);
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
+      /* Dashboard Specific Layout Tweaks */
+      .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
         margin-top: 20px;
+      }
+
+      .admin-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .admin-card h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         color: var(--text-main);
       }
-      th,
-      td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-      }
-      th {
-        background: var(--bg-color);
-        font-weight: 700;
-      }
-      .status-badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
+
+      /* Premium Form Elements */
+      label {
+        display: block;
         font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        color: var(--text-muted);
       }
-      .status-processing {
-        background: #d1ecf1;
-        color: #0c5460;
+
+      input, select, textarea {
+        width: 100%;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.02);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
       }
-      .status-pending {
-        background: #fff3cd;
-        color: #856404;
+
+      [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+        background: rgba(255, 255, 255, 0.03);
       }
+
+      input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: transparent;
+      }
+
+      /* Responsive Tables */
       .table-container {
         width: 100%;
         overflow-x: auto;
-        border-radius: 12px;
+        border-radius: 16px;
         border: 1px solid var(--border);
-        margin-top: 1rem;
+        background: var(--card-bg);
+        margin-top: 15px;
       }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+      }
+
+      th, td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      th {
+        background: rgba(0,0,0,0.02);
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Status Pills */
+      .status-pill {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+      }
+
+      .status-pending { background: #fff3cd; color: #856404; }
+      .status-resolved { background: #d4edda; color: #155724; }
+      .status-processing { background: #d1ecf1; color: #0c5460; }
+      .status-cancelled { background: #f8d7da; color: #721c24; }
+
       @media (max-width: 768px) {
-        .admin-grid { grid-template-columns: 1fr !important; }
-        .navbar { 
-            padding: 10px 15px;
-            flex-wrap: wrap; 
-            gap: 10px; 
-            justify-content: center;
-        }
-        .navbar div { justify-content: center; width: 100%; }
-        .admin-card { padding: 1rem !important; }
-        th, td { padding: 10px; font-size: 0.85rem; }
+        .admin-grid { grid-template-columns: 1fr; }
+        .store-container { padding: 80px 15px 40px; }
       }
     </style>
   </head>
-  <body class="store-body">
+
+  <body>
     <nav class="navbar">
-      <div class="nav-container">
-        <!-- 1. Hamburger Menu (Mobile Only) -->
-        <div class="hamburger-menu" onclick="toggleMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+      <a href="{{ url_for('admin_dashboard') }}" class="brand-logo">AK <span>Admin</span></a>
+      
+      <div class="hamburger-menu" id="hamburger">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
 
-        <!-- 2. Branding (Left desktop, Center mobile) -->
-        <div class="branding">
-          <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
-            <div class="brand-logo" style="margin: 0;">
-              AK <span style="color: #27ae60">Admin</span>
-            </div>
-          </a>
-        </div>
-
-        <!-- 3. Desktop Nav Links -->
-        <div class="search-nav-wrapper" style="flex: 1; display: flex; justify-content: flex-end; gap: 20px; align-items: center;">
-          <a href="{{ url_for('index') }}" class="nav-link" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
-          <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--text-muted); text-decoration: none">Logout</a>
-        </div>
-
-        <!-- 4. Mobile Nav Popup -->
-        <div class="nav-content" id="navMenu">
-          <button class="close-menu" onclick="toggleMenu()">✕</button>
-          <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Store</a>
-          <a href="{{ url_for('logout') }}" class="mobile-nav-link" style="color: var(--text-muted)">Logout</a>
-        </div>
+      <div class="nav-content" id="navContent">
+        <button class="close-menu" id="closeBtn">×</button>
+        
+        <a href="{{ url_for('index') }}" class="nav-link-btn">🏠 View Store</a>
+        
+        <form action="{{ url_for('logout') }}" method="GET" class="logout-form">
+          <button type="submit" class="btn-logout">Logout</button>
+        </form>
       </div>
     </nav>
 
-
-    <div class="store-container" style="padding: 20px">
+    <div class="store-container">
+      
       <div class="admin-card">
         <h2>📂 Category & Brand Manager</h2>
-        <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+        <div class="admin-grid" style="margin-top: 0;">
           <form action="{{ url_for('add_category') }}" method="POST">
-            <label>1. Create Main Category</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="e.g., Mixer Grinder"
-              required
-            />
-            <button type="submit" class="primary-btn">Add Category</button>
+            <label>Create Main Category</label>
+            <input type="text" name="name" placeholder="e.g., Mixer Grinder" required />
+            <button type="submit" class="primary-btn" style="width: 100%;">Add Category</button>
           </form>
+
           <form action="{{ url_for('add_subcategory') }}" method="POST">
-            <label>2. Add Brand to Category</label>
+            <label>Add Brand to Category</label>
             <select name="category_id" required>
-              <option value="" disabled selected>
-                Select Parent Category...
-              </option>
+              <option value="" disabled selected>Select Parent Category...</option>
               {% for c in categories %}
               <option value="{{ c.id }}">{{ c.name }}</option>
               {% endfor %}
             </select>
-            <input
-              type="text"
-              name="name"
-              placeholder="e.g., Jaipan 750w"
-              required
-            />
-            <button
-              type="submit"
-              class="primary-btn"
-              style="background: #27ae60"
-            >
-              Add Brand
-            </button>
+            <input type="text" name="name" placeholder="e.g., Jaipan 750w" required />
+            <button type="submit" class="primary-btn" style="width: 100%; background: #27ae60;">Add Brand</button>
           </form>
         </div>
       </div>
 
-      <div class="admin-card">
+      <div class="admin-card" style="margin-top: 30px;">
         <h2>📦 Add New Product</h2>
-        <form
-          action="{{ url_for('add_product') }}"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+        <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+          <div class="admin-grid" style="margin-top: 0;">
             <div>
               <label>Product Name</label>
-              <input type="text" name="name" required />
+              <input type="text" name="name" placeholder="Full product title" required />
             </div>
             <div>
               <label>Price (₹)</label>
-              <input type="number" step="0.01" name="price" required />
+              <input type="number" step="0.01" name="price" placeholder="0.00" required />
             </div>
             <div>
               <label>Category</label>
-              <select
-                id="main_category"
-                name="category"
-                onchange="updateSubCategories()"
-                required
-              >
+              <select id="main_category" name="category" onchange="updateSubCategories()" required>
                 <option value="" disabled selected>Select Category</option>
                 {% for c in categories %}
                 <option value="{{ c.name }}">{{ c.name }}</option>
@@ -182,42 +184,34 @@
               </select>
             </div>
             <div>
-              <label>Sub-Category / Brand</label>
+              <label>Brand / Model</label>
               <select id="sub_category" name="sub_category" required>
-                <option value="" disabled selected>Select Sub-Category</option>
+                <option value="" disabled selected>Select Brand</option>
               </select>
             </div>
           </div>
 
-          <div style="margin-top: 10px">
-            <label style="font-weight: 600"
-              >Upload Product Images (Select Multiple)</label
-            >
-            <input
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              required
-            />
-          </div>
+          <label>Product Images (Select Multiple)</label>
+          <input type="file" name="images" accept="image/*" multiple required />
 
           <label>Description</label>
-          <textarea name="description" rows="3"></textarea>
-          <button type="submit" class="primary-btn">List Product</button>
+          <textarea name="description" rows="4" placeholder="Features, specifications, etc."></textarea>
+          
+          <button type="submit" class="primary-btn" style="padding: 15px 40px;">🚀 List Product</button>
         </form>
       </div>
 
-      <div class="admin-card" style="margin-top: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
-            <h2>🛍️ Manage Products</h2>
-            <input type="text" id="productSearch" placeholder="Search products..." style="max-width: 250px; margin: 0;">
+      <div class="admin-card" style="margin-top: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+          <h2>🛍️ Inventory Control</h2>
+          <input type="text" id="productSearch" placeholder="Search products..." style="max-width: 300px; margin-bottom: 0;">
         </div>
+        
         <div class="table-container">
           <table id="productTable">
             <thead>
               <tr>
-                <th>Image</th>
+                <th>Preview</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -228,25 +222,16 @@
               {% for p in products %}
               <tr>
                 <td>
-                    <img src="{{ url_for('static', filename='uploads/' + (p.image_url.split(',')[0] if p.image_url else 'default.png')) }}" 
-                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                  <img src="{{ url_for('static', filename='uploads/' + (p.image_url.split(',')[0] if p.image_url else 'default.png')) }}" 
+                       style="width: 45px; height: 45px; object-fit: cover; border-radius: 10px;">
                 </td>
                 <td style="font-weight: 600;">{{ p.name }}</td>
-                <td><span class="status-badge" style="background: rgba(0,0,0,0.05);">{{ p.category }}</span></td>
-                <td style="color: var(--primary); font-weight: 700;">₹{{ p.price }}</td>
+                <td><span class="status-pill" style="background: rgba(0,0,0,0.05);">{{ p.category }}</span></td>
+                <td style="color: var(--primary); font-weight: 800;">₹{{ p.price }}</td>
                 <td>
-                  <div style="display: flex; gap: 10px;">
-                    <a href="{{ url_for('edit_product', product_id=p.id) }}" 
-                       class="primary-btn" 
-                       style="background: var(--primary); padding: 8px 15px; font-size: 13px; text-decoration: none;">
-                       ✏️ Edit
-                    </a>
-                    <a href="{{ url_for('delete_product', id=p.id) }}" 
-                       class="primary-btn" 
-                       style="background: #e74c3c; padding: 8px 15px; font-size: 13px; text-decoration: none;"
-                       onclick="return confirm('Permanent delete this product?')">
-                       🗑️ Delete
-                    </a>
+                  <div style="display: flex; gap: 8px;">
+                    <a href="{{ url_for('edit_product', product_id=p.id) }}" class="nav-link-btn" style="height: 35px; font-size: 12px; border-color: var(--primary); color: var(--primary);">✏️ Edit</a>
+                    <a href="{{ url_for('delete_product', id=p.id) }}" class="nav-link-btn" style="height: 35px; font-size: 12px; border-color: #ef4444; color: #ef4444;" onclick="return confirm('Delete this product permanently?')">🗑️</a>
                   </div>
                 </td>
               </tr>
@@ -256,14 +241,13 @@
         </div>
       </div>
 
-      <div class="admin-card">
-        <h2>📩 Customer Queries & Requests</h2>
+      <div class="admin-card" style="margin-top: 30px;">
+        <h2>📩 Customer Support</h2>
         <div class="table-container">
           <table>
             <thead>
               <tr>
-                <th>S.No</th>
-                <th>User ID</th>
+                <th>User</th>
                 <th>Type</th>
                 <th>Message</th>
                 <th>Status</th>
@@ -273,198 +257,47 @@
             <tbody>
               {% for q in notifications %}
               <tr>
-                <td>{{ loop.index }}</td>
                 <td>User #{{ q.user_id }}</td>
-                <td style="font-weight: bold">{{ q.request_type }}</td>
-                <td>{{ q.message }}</td>
+                <td style="font-weight: 600;">{{ q.request_type }}</td>
+                <td style="font-size: 0.9rem; color: var(--text-muted);">{{ q.message }}</td>
                 <td>
-                  {% if q.status == 'Pending' %}
-                  <span class="status-badge status-pending">Pending</span>
-                  {% else %}
-                  <span
-                    class="status-badge"
-                    style="background: #d4edda; color: #155724"
-                    >Resolved</span
-                  >
-                  {% endif %}
+                  <span class="status-pill {% if q.status == 'Pending' %}status-pending{% else %}status-resolved{% endif %}">
+                    {{ q.status }}
+                  </span>
                 </td>
-                <td style="display: flex; gap: 10px">
-                  {% if q.status == 'Pending' %}
-                  <a
-                    href="{{ url_for('resolve_request', req_id=q.id) }}"
-                    class="primary-btn"
-                    style="
-                      background: #27ae60;
-                      padding: 6px 12px;
-                      font-size: 12px;
-                      text-decoration: none;
-                    "
-                    >Resolve</a
-                  >
-                  {% endif %}
-                  <a
-                    href="{{ url_for('delete_request', req_id=q.id) }}"
-                    class="primary-btn"
-                    style="
-                      background: #e74c3c;
-                      padding: 6px 12px;
-                      font-size: 12px;
-                      text-decoration: none;
-                    "
-                    onclick="return confirm('Delete this request?');"
-                    >❌</a
-                  >
+                <td>
+                  <div style="display: flex; gap: 8px;">
+                    {% if q.status == 'Pending' %}
+                    <a href="{{ url_for('resolve_request', req_id=q.id) }}" class="nav-link-btn" style="height: 32px; font-size: 11px; color: #27ae60;">Resolve</a>
+                    {% endif %}
+                    <a href="{{ url_for('delete_request', req_id=q.id) }}" style="text-decoration: none;">🗑️</a>
+                  </div>
                 </td>
               </tr>
               {% else %}
-              <tr>
-                <td
-                  colspan="6"
-                  style="text-align: center; color: var(--text-muted)"
-                >
-                  No support requests yet.
-                </td>
-              </tr>
+              <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No queries found.</td></tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div class="admin-card">
-        <h2>📜 Order Management</h2>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer Info</th>
-                <th>Amount</th>
-                <th>Current Status</th>
-                <th>Update Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for order in orders %}
-              <tr>
-                <td style="font-weight: bold">#{{ order.id }}</td>
-                <td>
-                  <div style="font-size: 13px">
-                    {{ order.delivery_address }}
-                  </div>
-                  <div
-                    style="
-                      font-size: 11px;
-                      color: var(--text-muted);
-                      font-family: monospace;
-                    "
-                  >
-                    {{ order.tracking_number }}
-                  </div>
-                </td>
-                <td>₹{{ order.total_amount }}</td>
-                <td>
-                  {% if order.status == 'Cancelled' %}
-                  <span
-                    class="status-badge"
-                    style="background: #f8d7da; color: #721c24"
-                    >❌ {{ order.status }}</span
-                  >
-                  {% elif order.status == 'Delivered' %}
-                  <span
-                    class="status-badge"
-                    style="background: #d4edda; color: #155724"
-                    >✅ {{ order.status }}</span
-                  >
-                  {% else %}
-                  <span class="status-badge status-processing"
-                    >{{ order.status }}</span
-                  >
-                  {% endif %}
-                </td>
-                <td>
-                  <select
-                    onchange="location = this.value"
-                    style="
-                      margin: 0;
-                      padding: 5px;
-                      font-size: 12px;
-                      width: auto;
-                    "
-                  >
-                    <option value="" selected disabled>Change to...</option>
-                    <option
-                      value="{{ url_for('update_order', order_id=order.id, status='Shipped') }}"
-                    >
-                      🚚 Shipped
-                    </option>
-                    <option
-                      value="{{ url_for('update_order', order_id=order.id, status='Delivered') }}"
-                    >
-                      ✅ Delivered
-                    </option>
-                    <option
-                      value="{{ url_for('update_order', order_id=order.id, status='Out of Stock') }}"
-                    >
-                      ⚠️ Out of Stock
-                    </option>
-                  </select>
-                </td>
-                <td>
-                  <a
-                    href="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}"
-                    class="primary-btn"
-                    style="
-                      background: #e74c3c;
-                      padding: 6px 12px;
-                      font-size: 12px;
-                      text-decoration: none;
-                    "
-                    onclick="
-                      return confirm(
-                        'Are you sure you want to cancel this order?',
-                      );
-                    "
-                  >
-                    Cancel Order
-                  </a>
-                </td>
-              </tr>
-              {% else %}
-              <tr>
-                <td
-                  colspan="6"
-                  style="text-align: center; color: var(--text-muted)"
-                >
-                  No orders placed yet.
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
     <script id="category-data" type="application/json">
       {{ category_dict | tojson | safe }}
     </script>
+
     <script>
-      document.documentElement.setAttribute(
-        "data-theme",
-        localStorage.getItem("theme") || "light",
-      );
+      // 1. Theme Sync
+      document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "light");
 
-      const categoryData = JSON.parse(
-        document.getElementById("category-data").textContent,
-      );
-
+      // 2. Dynamic Categories
+      const categoryData = JSON.parse(document.getElementById("category-data").textContent);
       function updateSubCategories() {
         const mainCat = document.getElementById("main_category").value;
         const subSelect = document.getElementById("sub_category");
-        subSelect.innerHTML =
-          '<option value="" disabled selected>Select Sub-Category</option>';
+        subSelect.innerHTML = '<option value="" disabled selected>Select Brand</option>';
         if (categoryData[mainCat]) {
           categoryData[mainCat].forEach((sub) => {
             let opt = document.createElement("option");
@@ -475,24 +308,28 @@
         }
       }
 
-      // Product Search Filter
+      // 3. Search Filter
       document.getElementById("productSearch").addEventListener("keyup", function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll("#productTable tbody tr");
         rows.forEach(row => {
-          let name = row.cells[1].textContent.toLowerCase();
-          let category = row.cells[2].textContent.toLowerCase();
-          if (name.includes(filter) || category.includes(filter)) {
-            row.style.display = "";
-          } else {
-            row.style.display = "none";
-          }
+          let text = row.innerText.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
         });
       });
 
+      // 4. Mobile Menu
+      const hamburger = document.getElementById('hamburger');
+      const navContent = document.getElementById('navContent');
+      const closeBtn = document.getElementById('closeBtn');
+
       function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("active");
+        navContent.classList.toggle("active");
+        hamburger.classList.toggle("active");
       }
+
+      if (hamburger) hamburger.addEventListener('click', toggleMenu);
+      if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
     </script>
   </body>
 </html>

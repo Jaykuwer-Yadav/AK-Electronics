@@ -33,15 +33,23 @@
     </style>
 </head>
 <body class="store-body">
-    <nav class="navbar">
-        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
-                <div class="brand-logo" style="margin: 0;">
-                    AK <span style="color: #27ae60">Admin</span>
-                </div>
-            </a>
-            <a href="{{ url_for('admin_dashboard') }}" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">← Back to Dashboard</a>
+    <nav class="navbar admin-navbar">
+      <div class="nav-container">
+        <!-- Branding -->
+        <div class="branding">
+          <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
+            <div class="brand-logo" style="margin: 0;">
+              AK <span style="color: #27ae60">Admin</span>
+            </div>
+          </a>
         </div>
+
+        <!-- Links (Aligned Right always) -->
+        <div class="admin-links">
+          <a href="{{ url_for('index') }}" class="nav-link" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
+          <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--text-muted); text-decoration: none">Logout</a>
+        </div>
+      </div>
     </nav>
 
     <div class="edit-container">

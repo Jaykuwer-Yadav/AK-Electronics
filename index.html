@@ -41,41 +41,41 @@
       <!-- 3. Mobile Search Toggle (Right/After Logo mobile) -->
       <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
 
-      <!-- 4. Hamburger (Left mobile) -->
-      <div class="hamburger-menu" onclick="toggleMenu()">
+      <!-- 4. Animated Hamburger (Left mobile) -->
+      <div class="hamburger-menu" id="hamburger">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
 
       <!-- 5. Nav Content (Right desktop, Side menu mobile) -->
-      <div class="nav-content" id="navMenu">
-        <button class="close-menu" onclick="toggleMenu()">✕</button>
+      <div class="nav-content" id="navContent">
+        <button class="close-menu" id="closeBtn">×</button>
+
         <div class="theme-switch-wrapper">
           <label class="theme-switch">
-            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
-            <div class="slider">
-              <span class="icon moon">🌙</span>
-              <span class="icon sun">☀️</span>
-            </div>
+            <input type="checkbox" id="checkbox" onclick="toggleTheme()" />
+            <div class="slider"></div>
           </label>
         </div>
 
         {% if session.get('user_id') %}
-          <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 Cart {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
-          <a href="{{ url_for('my_orders') }}" class="mobile-nav-link">📦 Orders</a>
+          <a href="{{ url_for('cart') }}" class="nav-link-btn">🛒 Cart {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}</a>
+          <a href="{{ url_for('my_orders') }}" class="nav-link-btn">📦 Orders</a>
         {% endif %}
 
         {% if session.get('role') == 'admin' %}
-          <a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link" style="color: #27ae60">⚙️ Admin</a>
+          <a href="{{ url_for('admin_dashboard') }}" class="nav-link-btn nav-admin-btn">⚙️ Admin</a>
         {% elif session.get('role') == 'developer' %}
-          <a href="{{ url_for('developer_console') }}" class="mobile-nav-link" style="color: #e74c3c">🚀 Dev</a>
+          <a href="{{ url_for('developer_console') }}" class="nav-link-btn" style="color: #e74c3c; border-color: rgba(231, 76, 60, 0.2);">🚀 Dev</a>
         {% endif %}
 
         {% if session.get('user_id') or session.get('role') %}
-          <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
+          <form action="{{ url_for('logout') }}" method="GET" class="logout-form">
+            <button type="submit" class="btn-logout">Logout</button>
+          </form>
         {% else %}
-          <a href="{{ url_for('login') }}" class="primary-btn" style="width: auto; padding: 10px 20px; text-decoration: none">Login</a>
+          <a href="{{ url_for('login') }}" class="nav-link-btn login-btn">Login</a>
         {% endif %}
       </div>
     </nav>
@@ -188,9 +188,21 @@
     </script>
 
     <script>
+      const hamburger = document.getElementById('hamburger');
+      const navContent = document.getElementById('navContent');
+      const closeBtn = document.getElementById('closeBtn');
+
       function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("active");
+        navContent.classList.toggle("active");
+        hamburger.classList.toggle("active");
+        document.body.classList.toggle("nav-open");
       }
+
+      // Open menu
+      hamburger.addEventListener('click', toggleMenu);
+
+      // Close menu
+      closeBtn.addEventListener('click', toggleMenu);
 
       function toggleSearch() {
         const searchForm = document.getElementById("searchForm");
@@ -200,7 +212,7 @@
       }
 
       function toggleTheme() {
-        const checkbox = document.getElementById("theme-checkbox");
+        const checkbox = document.getElementById("checkbox");
         let newTheme = checkbox.checked ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
@@ -208,7 +220,7 @@
 
       const savedTheme = localStorage.getItem("theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
-      const themeCheckbox = document.getElementById("theme-checkbox");
+      const themeCheckbox = document.getElementById("checkbox");
       if (themeCheckbox) {
         themeCheckbox.checked = savedTheme === "dark";
       }
