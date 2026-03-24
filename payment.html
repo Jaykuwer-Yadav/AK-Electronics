@@ -183,9 +183,8 @@
                         <p style="font-size: 0.9rem; margin-bottom: 10px;">Scan QR to pay ₹{{ order.total_amount }}</p>
                         <div class="qr-placeholder">
                             <!-- Placeholder QR using a public API or static image -->
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=merchant@upi&pn=AK%20Electronics&am={{ order.total_amount }}&cu=INR" alt="UPI QR">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=9555918070@fam&pn=AK%20Electronics&am={{ order.total_amount }}&cu=INR" alt="UPI QR">
                         </div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">ID: merchant@upi</p>
                     </div>
 
                     <!-- Netbanking -->
