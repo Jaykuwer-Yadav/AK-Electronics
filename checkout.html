@@ -34,28 +34,42 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('index') }}" style="text-decoration: none;">
-        <div class="brand-logo">
-          AK <span>Electronics</span>
-        </div>
+      <!-- 1. Logo -->
+      <a href="{{ url_for('index') }}" class="brand-logo" style="order: 1">
+        AK <span>Electronics</span>
       </a>
 
-      <div class="nav-content" id="navMenu">
-        <label class="theme-switch" style="margin: 0 auto;">
-          <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
-          <div class="slider">
-            <span class="icon moon">🌙</span>
-            <span class="icon sun">☀️</span>
-          </div>
-        </label>
-        <a href="{{ url_for('cart') }}" class="mobile-nav-link" style="font-weight: 600;">🛒 My Cart</a>
-        <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text" style="color: var(--text-muted);">Logout</a>
-      </div>
+      <!-- 2. Search (Empty/Hidden for Checkout) -->
+      <form class="search-form" id="searchForm" action="{{ url_for('index') }}" method="GET">
+        <input type="text" name="search" placeholder="Search items..." />
+        <button type="submit" class="primary-btn" style="width: auto; padding: 10px 15px">Search</button>
+      </form>
 
+      <!-- 3. Mobile Search Toggle -->
+      <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
+
+      <!-- 4. Hamburger -->
       <div class="hamburger-menu" onclick="toggleMenu()">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
+      </div>
+
+      <!-- 5. Nav Content -->
+      <div class="nav-content" id="navMenu" style="order: 3">
+        <div class="theme-switch-wrapper">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
+            <div class="slider">
+              <span class="icon moon">🌙</span>
+              <span class="icon sun">☀️</span>
+            </div>
+          </label>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
+        <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 Cart</a>
+        <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
       </div>
     </nav>
 
@@ -131,11 +145,18 @@
         document.getElementById("navMenu").classList.toggle("active");
       }
 
+      function toggleSearch() {
+        const searchForm = document.getElementById("searchForm");
+        const storeContainer = document.querySelector(".store-container");
+        searchForm.classList.toggle("active");
+        storeContainer.classList.toggle("search-active");
+      }
+
       function toggleTheme() {
-        const isDark = document.getElementById("theme-checkbox").checked;
-        const theme = isDark ? "dark" : "light";
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
+        const checkbox = document.getElementById("theme-checkbox");
+        let newTheme = checkbox.checked ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
       }
 
       const savedTheme = localStorage.getItem("theme") || "light";

@@ -47,66 +47,46 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('index') }}" style="text-decoration: none">
-        <div
-          class="brand-logo"
-          style="
-            font-weight: bold;
-            font-size: 24px;
-            color: var(--text-main);
-            margin: 0;
-          "
-        >
-          AK <span style="color: var(--primary)">Electronics</span>
-        </div>
+      <!-- 1. Logo -->
+      <a href="{{ url_for('index') }}" class="brand-logo" style="order: 1">
+        AK <span>Electronics</span>
       </a>
 
-      <form class="search-form" action="{{ url_for('index') }}" method="GET">
-        <input type="text" name="search" placeholder="Search products..." />
-        <button type="submit" class="primary-btn">Search</button>
+      <!-- 2. Search -->
+      <form class="search-form" id="searchForm" action="{{ url_for('index') }}" method="GET">
+        <input type="text" name="search" placeholder="Search items..." />
+        <button type="submit" class="primary-btn" style="width: auto; padding: 10px 15px">Search</button>
       </form>
 
-      <div class="nav-content" id="navMenu">
-        <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle" />
-          <span class="slider">
-            <span class="icon sun">☀️</span>
-            <span class="icon moon">🌙</span>
-          </span>
-        </label>
+      <!-- 3. Mobile Search Toggle -->
+      <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
 
-        <a
-          href="{{ url_for('cart') }}"
-          class="mobile-nav-link"
-          style="
-            color: var(--text-main);
-            font-weight: 600;
-            text-decoration: none;
-          "
-          >🛒 My Cart</a
-        >
-
-        {% if session.get('user_id') %}
-        <a
-          href="{{ url_for('logout') }}"
-          class="mobile-nav-link"
-          style="color: var(--text-muted); text-decoration: none"
-          >Logout</a
-        >
-        {% else %}
-        <a
-          href="{{ url_for('login') }}"
-          class="mobile-nav-link"
-          style="color: var(--text-muted); text-decoration: none"
-          >Login</a
-        >
-        {% endif %}
-      </div>
-
+      <!-- 4. Hamburger -->
       <div class="hamburger-menu" onclick="toggleMenu()">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
+      </div>
+
+      <!-- 5. Nav Content -->
+      <div class="nav-content" id="navMenu" style="order: 3">
+        <div class="theme-switch-wrapper">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
+            <div class="slider">
+              <span class="icon moon">🌙</span>
+              <span class="icon sun">☀️</span>
+            </div>
+          </label>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('my_orders') }}" class="mobile-nav-link">📦 Orders</a>
+          <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="primary-btn" style="width: auto; padding: 10px 20px; text-decoration: none">Login</a>
+        {% endif %}
       </div>
     </nav>
 
@@ -166,24 +146,30 @@
     </div>
 
     <script>
-      // Theme Toggle Logic
-      const themeToggle = document.getElementById("theme-toggle");
-      const currentTheme = localStorage.getItem("theme") || "light";
-      document.documentElement.setAttribute("data-theme", currentTheme);
-      if (currentTheme === "dark") themeToggle.checked = true;
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
 
-      themeToggle.addEventListener("change", function () {
-        const newTheme = this.checked ? "dark" : "light";
+      function toggleSearch() {
+        const searchForm = document.getElementById("searchForm");
+        const storeContainer = document.querySelector(".store-container");
+        searchForm.classList.toggle("active");
+        storeContainer.classList.toggle("search-active");
+      }
+
+      function toggleTheme() {
+        const checkbox = document.getElementById("theme-checkbox");
+        let newTheme = checkbox.checked ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
-      });
+      }
 
-      // Mobile Hamburger Menu Logic
-      const hamburger = document.getElementById("hamburger");
-      const navMenu = document.getElementById("navMenu");
-      hamburger.addEventListener("click", () => {
-        navMenu.classList.toggle("active");
-      });
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      const themeCheckbox = document.getElementById("theme-checkbox");
+      if (themeCheckbox) {
+        themeCheckbox.checked = savedTheme === "dark";
+      }
     </script>
   </body>
 </html>
