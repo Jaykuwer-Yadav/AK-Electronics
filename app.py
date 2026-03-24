@@ -68,9 +68,8 @@ class User(db.Model):
     role = db.Column(db.String(20), default="user")
     phone = db.Column(db.String(20))
     address = db.Column(db.Text)
-    cart_items = db.relationship("CartItem", backref="buyer", lazy=True)
-    orders = db.relationship("Order", backref="customer", lazy=True)
-    requests = db.relationship("ServiceRequest", backref="user", lazy=True)
+    # Relationships removed to avoid join errors with hybrid String/Integer IDs
+    # Manual queries are used instead (e.g. CartItem.query.filter_by(user_id=...))
 
 
 class Category(db.Model):
@@ -104,7 +103,7 @@ class CartItem(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.String(100), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), default="Processing")
     tracking_number = db.Column(db.String(50), unique=True)
@@ -113,7 +112,7 @@ class Order(db.Model):
 
 class ServiceRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.String(100), nullable=False)
     request_type = db.Column(db.String(50), nullable=False)
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="Pending")
