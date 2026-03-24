@@ -325,18 +325,31 @@ def checkout():
         return redirect(url_for("index"))
     
     total = 0
-    for i in items:
-        p_doc = fb_db.collection("products").document(i.product_id).get()
-        if p_doc.exists:
-            total += p_doc.to_dict().get('price', 0) * i.quantity
+    if fb_db:
+        for i in items:
+            p_doc = fb_db.collection("products").document(i.product_id).get()
+            if p_doc.exists:
+                total += p_doc.to_dict().get('price', 0) * i.quantity
+                
     if request.method == "POST":
-        u = User.query.get(user_id)
-        u.phone, u.address = request.form.get("phone"), request.form.get("address")
+        # Get delivery info directly from form (resilient to missing SQLite User record)
+        phone = request.form.get("phone")
+        address = request.form.get("address")
+        
+        # Try to update SQLite user if they exist (for traditional users), but don't crash if they don't
+        try:
+            u = User.query.get(user_id)
+            if u:
+                u.phone, u.address = phone, address
+                db.session.commit()
+        except:
+            pass
+
         db.session.add(
             Order(
                 user_id=user_id,
                 total_amount=total,
-                delivery_address=f"{u.phone} | {u.address}",
+                delivery_address=f"{phone} | {address}",
                 tracking_number="AK-" + str(uuid.uuid4())[:8].upper(),
             )
         )

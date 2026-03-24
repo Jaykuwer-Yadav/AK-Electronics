@@ -165,102 +165,67 @@
         >
         {% endif %}
       </div>
+
+      <div class="hamburger-menu" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
     </nav>
 
     <main class="store-container">
+      <!-- HERO SECTION -->
+      <section class="hero-banner">
+        <div class="hero-content">
+          <span>Premium Tech Hub</span>
+          <h1>AK ELECTRONICS</h1>
+          <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; max-width: 500px; margin-bottom: 2rem;">
+            Discover the future of electronics with our curated collection of high-end gadgets and appliances.
+          </p>
+          <a href="#products" class="primary-btn" style="background: white; color: black; box-shadow: none;">Shop Now</a>
+        </div>
+      </section>
+
+      <div id="products"></div>
+
       {% for category, items in categories.items() %}
       <div class="category-section">
-        <h2 style="margin: 20px 0">{{ category }}</h2>
-        <div
-          class="product-grid"
-          style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-          "
-        >
+        <h2>{{ category }}</h2>
+        <div class="product-grid">
           {% for item in items %}
           <div class="product-card">
-            <img
-              src="{{ url_for('static', filename='uploads/' + (item.image_url.split(',')[0] if item.image_url else 'default.png')) }}"
-              class="product-img"
-              style="width: 100%; height: 200px; object-fit: contain"
-            />
+            <div class="product-img-wrapper">
+              <img
+                src="{{ url_for('static', filename='uploads/' + (item.image_url.split(',')[0] if item.image_url else 'default.png')) }}"
+                class="product-img"
+              />
+            </div>
 
             <div class="product-info">
+              <span class="product-category">{{ item.sub_category }}</span>
               <h3>{{ item.name }}</h3>
-              <p
-                style="
-                  color: var(--primary);
-                  font-size: 13px;
-                  font-weight: bold;
-                  margin-bottom: 5px;
-                "
-              >
-                {{ item.sub_category }}
-              </p>
-              <p style="font-size: 14px; color: var(--text-muted)">
-                {{ item.description }}
-              </p>
+              <p class="product-desc">{{ item.description }}</p>
 
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-top: 15px;
-                "
-              >
-                <p style="font-weight: bold; font-size: 18px">
-                  ₹{{ item.price }}
-                </p>
+              <div class="product-price-row">
+                <p class="price-tag">₹{{ item.price }}</p>
 
-                <div style="margin-top: 15px; width: 130px">
-                  {% if session.get('user_id') or session.get('role') %} {% if
-                  item.id in cart_dict %}
-                  <div class="qty-control">
-                    <a
-                      href="{{ url_for('decrease_cart', product_id=item.id) }}"
-                      class="qty-btn"
-                      >-</a
-                    >
-                    <span class="qty-val">{{ cart_dict[item.id] }}</span>
-                    <a
-                      href="{{ url_for('add_to_cart', product_id=item.id) }}"
-                      class="qty-btn"
-                      >+</a
-                    >
-                  </div>
+                <div style="width: 140px">
+                  {% if session.get('user_id') or session.get('role') %} 
+                    {% if item.id in cart_dict %}
+                    <div class="qty-control">
+                      <a href="{{ url_for('decrease_cart', product_id=item.id) }}" class="qty-btn">-</a>
+                      <span class="qty-val">{{ cart_dict[item.id] }}</span>
+                      <a href="{{ url_for('add_to_cart', product_id=item.id) }}" class="qty-btn">+</a>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('add_to_cart', product_id=item.id) }}" class="primary-btn" style="width: 100%;">
+                      Add to Cart
+                    </a>
+                    {% endif %} 
                   {% else %}
-                  <a
-                    href="{{ url_for('add_to_cart', product_id=item.id) }}"
-                    class="primary-btn"
-                    style="
-                      width: 100%;
-                      padding: 8px 15px;
-                      text-decoration: none;
-                      text-align: center;
-                    "
-                    >Add to Cart</a
-                  >
-                  {% endif %} {% else %}
-                  <a
-                    href="{{ url_for('login') }}"
-                    onclick="
-                      alert(
-                        'Please log in or create an account to buy products!',
-                      )
-                    "
-                    class="primary-btn"
-                    style="
-                      width: 100%;
-                      padding: 8px 15px;
-                      text-decoration: none;
-                      background: #e74c3c;
-                      text-align: center;
-                    "
-                    >Add to Cart</a
-                  >
+                    <a href="{{ url_for('login') }}" onclick="alert('Please log in to shop!')" class="primary-btn" style="width: 100%; background: #64748b;">
+                      Add to Cart
+                    </a>
                   {% endif %}
                 </div>
               </div>
@@ -269,62 +234,24 @@
           {% endfor %}
         </div>
       </div>
-      {% else %}
-      <div style="text-align: center; margin-top: 80px">
-        <h3 style="color: var(--text-muted)">No products found.</h3>
-      </div>
-      {% endfor %} {% if session.get('user_id') or session.get('role') %}
-      <div
-        class="category-section"
-        style="
-          margin-top: 50px;
-          padding: 20px;
-          border-radius: 12px;
-          border: 1px solid var(--border);
-          max-width: 420px;
-          margin-left: auto;
-          margin-right: auto;
-        "
-      >
-        <h2
-          style="color: var(--primary); margin-bottom: 15px; text-align: center"
-        >
-          Support Desk
-        </h2>
-        <form
-          action="{{ url_for('submit_request') }}"
-          method="POST"
-          style="display: flex; flex-direction: column; gap: 15px"
-        >
-          <select
-            name="request_type"
-            required
-            style="
-              padding: 10px;
-              border-radius: 8px;
-              border: 1px solid var(--border);
-              background: var(--card-bg);
-              color: var(--text-main);
-            "
-          >
-            <option value="Repair Request">🛠️ Repair Request</option>
-            <option value="Product Request">📦 Product Request</option>
-            <option value="General Question">💬 General Question</option>
-          </select>
-          <textarea
-            name="message"
-            rows="3"
-            placeholder="Describe what you need..."
-            required
-            style="
-              padding: 10px;
-              border-radius: 8px;
-              border: 1px solid var(--border);
-              background: var(--card-bg);
-              color: var(--text-main);
-            "
-          ></textarea>
-          <button type="submit" class="primary-btn" style="width: auto">
+      {% endfor %}
+
+      {% if session.get('user_id') or session.get('role') %}
+      <div class="support-desk">
+        <h2 style="color: var(--primary); margin-bottom: 10px; border: none; justify-content: center;">Support Desk</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Need technical help? Our team is ready to assist.</p>
+        <form action="{{ url_for('submit_request') }}" method="POST" style="display: flex; flex-direction: column; gap: 15px">
+          <div class="input-group">
+            <select name="request_type" required>
+              <option value="Repair Request">🛠️ Repair Request</option>
+              <option value="Product Request">📦 Product Request</option>
+              <option value="General Question">💬 General Question</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <textarea name="message" rows="3" placeholder="Describe what you need..." required></textarea>
+          </div>
+          <button type="submit" class="primary-btn">
             Send to Admin
           </button>
         </form>
