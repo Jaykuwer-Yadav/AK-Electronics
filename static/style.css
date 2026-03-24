@@ -87,6 +87,7 @@ h1, h2, h3, .brand-logo {
     display: flex;
     align-items: center;
     gap: 8px;
+    order: 1; /* Desktop: Left */
 }
 
 .brand-logo span {
@@ -138,6 +139,7 @@ h1, h2, h3, .brand-logo {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    order: 3; /* Desktop: Right */
 }
 
 .mobile-nav-link {
@@ -477,12 +479,12 @@ input:checked + .slider {
         justify-content: space-between;
     }
     
-    .brand-logo { order: 2; flex: 1; justify-content: center; }
-    .hamburger-menu { order: 1; display: flex; margin-right: 15px; }
-    .search-toggle { display: block; order: 3; }
+    .brand-logo { order: 2 !important; flex: 1; justify-content: center; }
+    .hamburger-menu { order: 1 !important; display: flex; margin-right: 15px; }
+    .search-toggle { display: block; order: 3 !important; }
     
     .search-form { 
-        order: 4; 
+        order: 4 !important; 
         width: 100%; 
         margin: 10px 0 0 0; 
         display: none; 
