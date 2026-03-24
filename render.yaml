@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ak-electronics
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FIREBASE_KEY
+        sync: false
+        description: "Paste your firebase_key.json JSON content here"

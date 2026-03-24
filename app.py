@@ -88,10 +88,9 @@ class Product(db.Model):
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
+    user_id = db.Column(db.String(100), nullable=False)  # User ID is also a string in Firebase
+    product_id = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, default=1)
-    product = db.relationship("Product")
 
 
 class Order(db.Model):
@@ -230,7 +229,7 @@ def contact():
 
 
 # --- CART & CHECKOUT ROUTES ---
-@app.route("/add_to_cart/<int:product_id>")
+@app.route("/add_to_cart/<product_id>")
 def add_to_cart(product_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
@@ -245,7 +244,7 @@ def add_to_cart(product_id):
     return redirect(request.referrer or url_for("index"))
 
 
-@app.route("/decrease_cart/<int:product_id>")
+@app.route("/decrease_cart/<product_id>")
 def decrease_cart(product_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
@@ -265,8 +264,22 @@ def cart():
     if "user_id" not in session:
         return redirect(url_for("login"))
     items = CartItem.query.filter_by(user_id=session["user_id"]).all()
-    total = sum(i.product.price * i.quantity for i in items)
-    return render_template("cart.html", items=items, total=total)
+    
+    # Fetch product details from Firestore for each cart item
+    cart_display_items = []
+    total = 0
+    for item in items:
+        p_doc = fb_db.collection("products").document(item.product_id).get()
+        if p_doc.exists:
+            p_data = p_doc.to_dict()
+            p_data['id'] = p_doc.id
+            cart_display_items.append({
+                'item': item,
+                'product': p_data
+            })
+            total += p_data.get('price', 0) * item.quantity
+            
+    return render_template("cart.html", items=cart_display_items, total=total)
 
 
 @app.route("/remove_cart/<int:item_id>")
@@ -288,7 +301,12 @@ def checkout():
     items = CartItem.query.filter_by(user_id=user_id).all()
     if not items:
         return redirect(url_for("index"))
-    total = sum(i.product.price * i.quantity for i in items)
+    
+    total = 0
+    for i in items:
+        p_doc = fb_db.collection("products").document(i.product_id).get()
+        if p_doc.exists:
+            total += p_doc.to_dict().get('price', 0) * i.quantity
     if request.method == "POST":
         u = User.query.get(user_id)
         u.phone, u.address = request.form.get("phone"), request.form.get("address")

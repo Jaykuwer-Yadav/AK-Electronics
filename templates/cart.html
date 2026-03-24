@@ -113,32 +113,32 @@
     <div class="cart-container">
       <h2 style="margin-bottom: 20px">🛒 My Shopping Cart</h2>
 
-      {% if items %} {% for item in items %}
+      {% if items %} {% for entry in items %}
       <div class="cart-item">
         <img
-          src="{{ url_for('static', filename='uploads/' + item.product.image_url.split(',')[0]) }}"
+          src="{{ url_for('static', filename='uploads/' + entry.product.image_url.split(',')[0]) }}"
           class="cart-item-img"
         />
 
         <div class="cart-item-details">
           <h3 style="font-size: 16px; margin-bottom: 5px">
-            {{ item.product.name }}
+            {{ entry.product.name }}
           </h3>
           <p style="color: var(--primary); font-weight: bold">
-            ₹{{ item.product.price }}
+            ₹{{ entry.product.price }}
           </p>
         </div>
 
         <div style="width: 130px">
           <div class="qty-control">
             <a
-              href="{{ url_for('decrease_cart', product_id=item.product_id) }}"
+              href="{{ url_for('decrease_cart', product_id=entry.product.id) }}"
               class="qty-btn"
               >-</a
             >
-            <span class="qty-val">{{ item.quantity }}</span>
+            <span class="qty-val">{{ entry.item.quantity }}</span>
             <a
-              href="{{ url_for('add_to_cart', product_id=item.product_id) }}"
+              href="{{ url_for('add_to_cart', product_id=entry.product.id) }}"
               class="qty-btn"
               >+</a
             >
@@ -146,7 +146,7 @@
         </div>
 
         <a
-          href="{{ url_for('remove_cart', item_id=item.id) }}"
+          href="{{ url_for('remove_cart', item_id=entry.item.id) }}"
           style="
             color: #e74c3c;
             font-size: 20px;
