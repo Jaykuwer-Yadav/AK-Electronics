@@ -118,8 +118,15 @@
             errorDiv.style.display = 'block';
           }
         } catch (error) {
-          errorDiv.innerText = error.message;
-          errorDiv.style.display = 'block';
+          // MAGIC FALLBACK: If Firebase fails, try the traditional form login 
+          // (This allows admin@ak.com and dev@ak.com to work without being in Firebase)
+          if (email === "admin@ak.com" || email === "dev@ak.com") {
+              console.log("🔄 Firebase login failed, attempting backend fallback...");
+              document.getElementById('loginForm').submit();
+          } else {
+              errorDiv.innerText = error.message;
+              errorDiv.style.display = 'block';
+          }
         }
       });
     </script>
