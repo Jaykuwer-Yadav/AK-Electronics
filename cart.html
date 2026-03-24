@@ -118,8 +118,8 @@
       {% if items %} 
       <div style="display: flex; flex-direction: column; gap: 1.5rem;">
         {% for entry in items %}
-        <div class="product-card" style="flex-direction: row; align-items: center; padding: 1rem; gap: 1.5rem;">
-          <div class="product-img-wrapper" style="width: 100px; height: 100px; border-radius: 12px; padding: 10px;">
+        <div class="cart-item-card">
+          <div class="product-img-wrapper" style="width: 120px; height: 120px; border-radius: 16px; padding: 10px; background: white; flex-shrink: 0;">
             <img
               src="{{ url_for('static', filename='uploads/' + entry.product.image_url.split(',')[0]) }}"
               class="product-img"
@@ -127,24 +127,24 @@
           </div>
 
           <div style="flex: 1;">
+            <span class="product-category" style="margin-bottom: 2px; font-size: 0.75rem;">{{ entry.product.category }}</span>
             <h3 style="font-size: 1.1rem; margin-bottom: 4px;">{{ entry.product.name }}</h3>
-            <p style="color: var(--primary); font-weight: 800; font-size: 1.2rem;">₹{{ entry.product.price }}</p>
-          </div>
+            <p style="color: var(--primary); font-weight: 800; font-size: 1.25rem;">₹{{ entry.product.price }}</p>
 
-          <div style="width: 120px">
-            <div class="qty-control">
+            <div class="qty-control" style="margin-top: 12px; width: fit-content;">
               <a href="{{ url_for('decrease_cart', product_id=entry.product.id) }}" class="qty-btn">-</a>
-              <span class="qty-val">{{ entry.item.quantity }}</span>
+              <span style="font-weight: 700; min-width: 24px; text-align: center;">{{ entry.item.quantity }}</span>
               <a href="{{ url_for('add_to_cart', product_id=entry.product.id) }}" class="qty-btn">+</a>
             </div>
           </div>
 
-          <a href="{{ url_for('remove_cart', item_id=entry.item.id) }}" 
-             style="color: var(--text-muted); font-size: 1.2rem; text-decoration: none; padding: 10px; transition: color 0.3s;"
-             onmouseover="this.style.color='#ef4444'"
-             onmouseout="this.style.color='var(--text-muted)'">
-            ✕
-          </a>
+          <div style="margin-left: auto;">
+            <a href="{{ url_for('remove_cart', item_id=entry.item.id) }}" 
+               style="color: #ef4444; font-size: 1.4rem; text-decoration: none; padding: 8px;"
+               title="Remove Item">
+              🗑️
+            </a>
+          </div>
         </div>
         {% endfor %}
       </div>

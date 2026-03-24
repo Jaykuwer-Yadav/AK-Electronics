@@ -30,7 +30,7 @@
         Welcome back! Please enter your details.
       </p>
 
-      <form action="{{ url_for('login') }}" method="POST">
+      <form id="loginForm" action="{{ url_for('login') }}" method="POST">
         <div class="input-group">
           <label>Email address</label>
           <input
@@ -44,11 +44,24 @@
           <label>Password</label>
           <input
             type="password"
+            id="password"
             name="password"
             placeholder="••••••••"
             required
           />
         </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; margin: 10px 0 20px;">
+          <input type="checkbox" id="showPassword" style="width: 16px; height: 16px; cursor: pointer;">
+          <label for="showPassword" style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">Show Password</label>
+        </div>
+
+        <script>
+          document.getElementById('showPassword')?.addEventListener('change', function() {
+            const passInput = document.getElementById('password');
+            if (passInput) passInput.type = this.checked ? 'text' : 'password';
+          });
+        </script>
 
         <button type="button" id="loginBtn" class="primary-btn" style="margin-top: 10px">
           Sign In

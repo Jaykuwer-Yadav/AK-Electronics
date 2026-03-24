@@ -8,6 +8,17 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+      @media (max-width: 768px) {
+        .navbar { flex-wrap: wrap; gap: 10px; }
+      }
+    </style>
   </head>
   <body class="store-body">
     <nav class="navbar">

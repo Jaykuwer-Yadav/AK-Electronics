@@ -10,69 +10,68 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('home') }}" style="text-decoration: none">
-        <div class="brand-logo" style="margin: 0; color: var(--text-main)">
-          AK <span style="color: var(--primary)">Electronics</span>
+      <a href="{{ url_for('index') }}" style="text-decoration: none;">
+        <div class="brand-logo">
+          AK <span>Electronics</span>
         </div>
       </a>
-      <div style="display: flex; gap: 20px; align-items: center">
-        <a
-          href="{{ url_for('home') }}"
-          style="
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 600;
-          "
-          >Back to Store</a
-        >
-        <a
-          href="{{ url_for('cart') }}"
-          style="color: var(--primary); font-weight: 600; text-decoration: none"
-          >🛒 My Cart</a
-        >
+
+      <div class="nav-content" id="navMenu">
+        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
+        <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 My Cart</a>
+      </div>
+
+      <div class="hamburger-menu" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
       </div>
     </nav>
 
-    <main class="store-container">
-      <h2 class="category-title">All {{ category }}</h2>
-      <div class="product-grid">
-        {% for item in products %}
-        <div class="product-card">
-          <img
-            src="{{ url_for('static', filename='uploads/' + item.image_url) }}"
-            alt="{{ item.name }}"
-            class="product-img"
-          />
-          <div class="product-info">
-            <h3>{{ item.name }}</h3>
-            <p class="desc">{{ item.description }}</p>
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 15px;
-              "
-            >
-              <p class="price">₹{{ item.price }}</p>
-              <a
-                href="{{ url_for('add_to_cart', product_id=item.id) }}"
-                class="primary-btn"
-                style="width: auto; padding: 8px 15px; text-decoration: none"
-                >Add to Cart</a
-              >
+    <main class="store-container" style="max-width: 800px; margin-top: 4rem;">
+      <div class="auth-card" style="max-width: 100%; border-radius: 40px; padding: 4rem 3rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 2rem; border: none; text-align: center;">Our Story</h1>
+        
+        <div style="line-height: 1.8; color: var(--text-main); font-size: 1.1rem; text-align: center;">
+          <p style="margin-bottom: 2rem;">
+            Welcome to <strong>AK Electronics</strong>, your premier destination for high-end technology and professional repair services. 
+            Founded on the principles of quality, reliability, and innovation, we strive to bring the latest gadgets 
+            and expert technical support directly to your doorstep.
+          </p>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0;">
+            <div style="padding: 1.5rem; background: var(--bg-color); border-radius: 20px; border: 1px solid var(--border);">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Expert Repairs</h4>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">Certified technicians for all your hardware needs.</p>
+            </div>
+            <div style="padding: 1.5rem; background: var(--bg-color); border-radius: 20px; border: 1px solid var(--border);">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Premium Tech</h4>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">Curated selection of the world's best electronics.</p>
+            </div>
+            <div style="padding: 1.5rem; background: var(--bg-color); border-radius: 20px; border: 1px solid var(--border);">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Secure Shopping</h4>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">Safe transactions with Firebase backed security.</p>
             </div>
           </div>
+
+          <p>
+            Whether you're looking for an upgrade or need a trusted hand to fix your device, 
+            AK Electronics is here to serve you with excellence.
+          </p>
         </div>
-        {% else %}
-        <div style="text-align: center; margin-top: 80px; grid-column: 1 / -1">
-          <h3 style="color: var(--text-muted)">
-            No products found in {{ category }}.
-          </h3>
+
+        <div style="text-align: center; margin-top: 4rem;">
+          <a href="{{ url_for('index') }}" class="primary-btn" style="padding: 15px 40px;">Shop Now</a>
         </div>
-        {% endfor %}
       </div>
     </main>
+
+    <script>
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
+      document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "light");
+    </script>
 
     <script>
       document.documentElement.setAttribute(

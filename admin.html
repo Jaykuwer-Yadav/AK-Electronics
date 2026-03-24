@@ -49,52 +49,36 @@
         background: #fff3cd;
         color: #856404;
       }
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        margin-top: 1rem;
+      }
+      @media (max-width: 768px) {
+        .admin-grid { grid-template-columns: 1fr !important; }
+        .navbar { flex-wrap: wrap; gap: 10px; }
+      }
     </style>
   </head>
   <body class="store-body">
     <nav class="navbar">
       <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
-        <div
-          class="brand-logo"
-          style="
-            font-weight: bold;
-            font-size: 24px;
-            color: var(--text-main);
-            margin: 0;
-          "
-        >
+        <div class="brand-logo" style="margin: 0;">
           AK <span style="color: #27ae60">Admin</span>
         </div>
       </a>
-      <div style="display: flex; gap: 20px">
-        <a
-          href="{{ url_for('index') }}"
-          style="
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
-          "
-          >View Store</a
-        >
-        <a
-          href="{{ url_for('logout') }}"
-          style="color: var(--text-muted); text-decoration: none"
-          >Logout</a
-        >
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <a href="{{ url_for('index') }}" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
+        <a href="{{ url_for('logout') }}" style="color: var(--text-muted); text-decoration: none">Logout</a>
       </div>
     </nav>
 
     <div class="store-container" style="padding: 20px">
       <div class="admin-card">
         <h2>📂 Category & Brand Manager</h2>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-          "
-        >
+        <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
           <form action="{{ url_for('add_category') }}" method="POST">
             <label>1. Create Main Category</label>
             <input

@@ -10,69 +10,66 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('home') }}" style="text-decoration: none">
-        <div class="brand-logo" style="margin: 0; color: var(--text-main)">
-          AK <span style="color: var(--primary)">Electronics</span>
+      <a href="{{ url_for('index') }}" style="text-decoration: none;">
+        <div class="brand-logo">
+          AK <span>Electronics</span>
         </div>
       </a>
-      <div style="display: flex; gap: 20px; align-items: center">
-        <a
-          href="{{ url_for('home') }}"
-          style="
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 600;
-          "
-          >Back to Store</a
-        >
-        <a
-          href="{{ url_for('cart') }}"
-          style="color: var(--primary); font-weight: 600; text-decoration: none"
-          >🛒 My Cart</a
-        >
+
+      <div class="nav-content" id="navMenu">
+        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
+        <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 My Cart</a>
+      </div>
+
+      <div class="hamburger-menu" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
       </div>
     </nav>
 
     <main class="store-container">
-      <h2 class="category-title">All {{ category }}</h2>
+      <h2 style="margin-bottom: 2rem; border-left: 4px solid var(--primary); padding-left: 1rem;">
+        Browsing Category: <span style="color: var(--primary)">{{ category }}</span>
+      </h2>
+
       <div class="product-grid">
         {% for item in products %}
         <div class="product-card">
-          <img
-            src="{{ url_for('static', filename='uploads/' + item.image_url) }}"
-            alt="{{ item.name }}"
-            class="product-img"
-          />
+          <div class="product-img-wrapper">
+             <img
+              src="{{ url_for('static', filename='uploads/' + item.image_url.split(',')[0]) }}"
+              alt="{{ item.name }}"
+              class="product-img"
+            />
+          </div>
           <div class="product-info">
+            <span class="product-category">{{ item.category }}</span>
             <h3>{{ item.name }}</h3>
-            <p class="desc">{{ item.description }}</p>
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 15px;
-              "
-            >
-              <p class="price">₹{{ item.price }}</p>
-              <a
-                href="{{ url_for('add_to_cart', product_id=item.id) }}"
-                class="primary-btn"
-                style="width: auto; padding: 8px 15px; text-decoration: none"
-                >Add to Cart</a
-              >
+            <p class="product-desc">{{ item.description }}</p>
+            <div class="product-price-row">
+              <p class="price-tag">₹{{ item.price }}</p>
+              <a href="{{ url_for('add_to_cart', product_id=item.id) }}" class="primary-btn">
+                Add to Cart
+              </a>
             </div>
           </div>
         </div>
         {% else %}
-        <div style="text-align: center; margin-top: 80px; grid-column: 1 / -1">
-          <h3 style="color: var(--text-muted)">
-            No products found in {{ category }}.
-          </h3>
+        <div class="support-desk" style="grid-column: 1 / -1; width: 100%;">
+          <h3 style="color: var(--text-muted)">No products found in this category.</h3>
+          <a href="{{ url_for('index') }}" class="primary-btn" style="margin-top: 1.5rem;">View All Products</a>
         </div>
         {% endfor %}
       </div>
     </main>
+
+    <script>
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
+      document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "light");
+    </script>
 
     <script>
       document.documentElement.setAttribute(
