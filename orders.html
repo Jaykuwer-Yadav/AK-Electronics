@@ -41,43 +41,31 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <!-- 1. Logo -->
       <a href="{{ url_for('index') }}" class="brand-logo">
         AK <span>Electronics</span>
       </a>
 
-      <!-- 2. Search -->
-      <form class="search-form" id="searchForm" action="{{ url_for('index') }}" method="GET">
-        <input type="text" name="search" placeholder="Search items..." />
-        <button type="submit" class="primary-btn" style="width: auto; padding: 10px 15px">Search</button>
-      </form>
-
-      <!-- 3. Mobile Search Toggle -->
-      <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
-
-      <!-- 4. Hamburger -->
-      <div class="hamburger-menu" onclick="toggleMenu()">
+      <div class="hamburger-menu" id="hamburger">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
 
-      <!-- 5. Nav Content -->
-      <div class="nav-content" id="navMenu">
-        <button class="close-menu" onclick="toggleMenu()">✕</button>
+      <div class="nav-content" id="navContent">
+        <button class="close-menu" id="closeBtn">×</button>
         <div class="theme-switch-wrapper">
           <label class="theme-switch">
-            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
-            <div class="slider">
-              <span class="icon moon">🌙</span>
-              <span class="icon sun">☀️</span>
-            </div>
+            <input type="checkbox" id="checkbox" onclick="toggleTheme()" />
+            <div class="slider"></div>
           </label>
         </div>
 
-        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
-        <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 Cart</a>
-        <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
+        <a href="{{ url_for('index') }}" class="nav-link-btn">🏠 Home</a>
+        <a href="{{ url_for('cart') }}" class="nav-link-btn">🛒 Cart</a>
+        
+        <form action="{{ url_for('logout') }}" method="GET" class="logout-form">
+          <button type="submit" class="btn-logout">Logout</button>
+        </form>
       </div>
     </nav>
 
@@ -101,9 +89,9 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div style="background: var(--bg-color); padding: 1rem; border-radius: 16px; border: 1px solid var(--border);">
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">STATUS</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">ORDER STATUS</p>
               <div style="display: flex; align-items: center; gap: 8px;">
                 {% if order.status == 'Processing' %}
                 <span style="color: #e67e22; font-weight: 700;">⏳ {{ order.status }}</span>
@@ -111,6 +99,8 @@
                 <span style="color: #3498db; font-weight: 700;">🚚 {{ order.status }}</span>
                 {% elif order.status == 'Delivered' %}
                 <span style="color: #27ae60; font-weight: 700;">✅ {{ order.status }}</span>
+                {% elif order.status == 'Confirmed' %}
+                <span style="color: #10b981; font-weight: 700;">💳 {{ order.status }}</span>
                 {% else %}
                 <span style="font-weight: 700;">{{ order.status }}</span>
                 {% endif %}
@@ -118,8 +108,17 @@
             </div>
 
             <div style="background: var(--bg-color); padding: 1rem; border-radius: 16px; border: 1px solid var(--border);">
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">PAYMENT</p>
+              <p style="font-weight: 600; font-size: 0.9rem;">
+                <span style="color: var(--primary);">{{ order.payment_method }}</span>
+                <br>
+                <small style="color: var(--text-muted);">{{ order.payment_status }}</small>
+              </p>
+            </div>
+
+            <div style="background: var(--bg-color); padding: 1rem; border-radius: 16px; border: 1px solid var(--border);">
               <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">TRACKING ID</p>
-              <p style="font-family: monospace; font-weight: 700; color: var(--primary); letter-spacing: 1px;">{{ order.tracking_number }}</p>
+              <p style="font-family: monospace; font-weight: 700; color: var(--text-main); font-size: 0.8rem;">{{ order.tracking_number }}</p>
             </div>
           </div>
 
@@ -139,19 +138,20 @@
     </main>
 
     <script>
+      const hamburger = document.getElementById('hamburger');
+      const navContent = document.getElementById('navContent');
+      const closeBtn = document.getElementById('closeBtn');
+
       function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("active");
+        navContent.classList.toggle("active");
+        hamburger.classList.toggle("active");
       }
 
-      function toggleSearch() {
-        const searchForm = document.getElementById("searchForm");
-        const storeContainer = document.querySelector(".store-container");
-        searchForm.classList.toggle("active");
-        storeContainer.classList.toggle("search-active");
-      }
+      if (hamburger) hamburger.addEventListener('click', toggleMenu);
+      if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
 
       function toggleTheme() {
-        const checkbox = document.getElementById("theme-checkbox");
+        const checkbox = document.getElementById("checkbox");
         let newTheme = checkbox.checked ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
@@ -159,7 +159,7 @@
 
       const savedTheme = localStorage.getItem("theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
-      const themeCheckbox = document.getElementById("theme-checkbox");
+      const themeCheckbox = document.getElementById("checkbox");
       if (themeCheckbox) {
         themeCheckbox.checked = savedTheme === "dark";
       }

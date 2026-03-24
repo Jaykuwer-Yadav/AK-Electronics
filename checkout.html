@@ -34,43 +34,31 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <!-- 1. Logo -->
       <a href="{{ url_for('index') }}" class="brand-logo">
         AK <span>Electronics</span>
       </a>
 
-      <!-- 2. Search (Empty/Hidden for Checkout) -->
-      <form class="search-form" id="searchForm" action="{{ url_for('index') }}" method="GET">
-        <input type="text" name="search" placeholder="Search items..." />
-        <button type="submit" class="primary-btn" style="width: auto; padding: 10px 15px">Search</button>
-      </form>
-
-      <!-- 3. Mobile Search Toggle -->
-      <button class="search-toggle" onclick="toggleSearch()" id="searchBtn">🔍</button>
-
-      <!-- 4. Hamburger -->
-      <div class="hamburger-menu" onclick="toggleMenu()">
+      <div class="hamburger-menu" id="hamburger">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
 
-      <!-- 5. Nav Content -->
-      <div class="nav-content" id="navMenu">
-        <button class="close-menu" onclick="toggleMenu()">✕</button>
+      <div class="nav-content" id="navContent">
+        <button class="close-menu" id="closeBtn">×</button>
         <div class="theme-switch-wrapper">
           <label class="theme-switch">
-            <input type="checkbox" id="theme-checkbox" onclick="toggleTheme()" />
-            <div class="slider">
-              <span class="icon moon">🌙</span>
-              <span class="icon sun">☀️</span>
-            </div>
+            <input type="checkbox" id="checkbox" onclick="toggleTheme()" />
+            <div class="slider"></div>
           </label>
         </div>
 
-        <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Home</a>
-        <a href="{{ url_for('cart') }}" class="mobile-nav-link">🛒 Cart</a>
-        <a href="{{ url_for('logout') }}" class="mobile-nav-link logout-text">Logout</a>
+        <a href="{{ url_for('index') }}" class="nav-link-btn">🏠 Home</a>
+        <a href="{{ url_for('cart') }}" class="nav-link-btn">🛒 Cart</a>
+        
+        <form action="{{ url_for('logout') }}" method="GET" class="logout-form">
+          <button type="submit" class="btn-logout">Logout</button>
+        </form>
       </div>
     </nav>
 
@@ -121,8 +109,8 @@
             ></textarea>
           </div>
 
-          <button type="submit" class="primary-btn" style="width: 100%; margin-top: 1rem; padding: 16px; font-size: 1.1rem;">
-            Place Order (COD)
+          <button type="submit" class="primary-btn" style="width: 100%; margin-top: 1rem; padding: 16px; font-size: 1.1rem; gap: 10px;">
+            Proceed to Payment 💳
           </button>
         </form>
         
@@ -142,19 +130,20 @@
           document.getElementById("fullPhone").value = code + " " + number;
         });
 
+      const hamburger = document.getElementById('hamburger');
+      const navContent = document.getElementById('navContent');
+      const closeBtn = document.getElementById('closeBtn');
+
       function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("active");
+        navContent.classList.toggle("active");
+        hamburger.classList.toggle("active");
       }
 
-      function toggleSearch() {
-        const searchForm = document.getElementById("searchForm");
-        const storeContainer = document.querySelector(".store-container");
-        searchForm.classList.toggle("active");
-        storeContainer.classList.toggle("search-active");
-      }
+      if (hamburger) hamburger.addEventListener('click', toggleMenu);
+      if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
 
       function toggleTheme() {
-        const checkbox = document.getElementById("theme-checkbox");
+        const checkbox = document.getElementById("checkbox");
         let newTheme = checkbox.checked ? "dark" : "light";
         document.documentElement.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
@@ -162,7 +151,7 @@
 
       const savedTheme = localStorage.getItem("theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
-      const themeCheckbox = document.getElementById("theme-checkbox");
+      const themeCheckbox = document.getElementById("checkbox");
       if (themeCheckbox) {
         themeCheckbox.checked = savedTheme === "dark";
       }

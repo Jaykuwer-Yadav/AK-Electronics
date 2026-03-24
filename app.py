@@ -108,6 +108,8 @@ class Order(db.Model):
     status = db.Column(db.String(50), default="Processing")
     tracking_number = db.Column(db.String(50), unique=True)
     delivery_address = db.Column(db.Text, nullable=False)
+    payment_method = db.Column(db.String(50), default="Pending")
+    payment_status = db.Column(db.String(50), default="Unpaid")
 
 
 class ServiceRequest(db.Model):
@@ -342,33 +344,57 @@ def checkout():
                 total += p_doc.to_dict().get('price', 0) * i.quantity
                 
     if request.method == "POST":
-        # Get delivery info directly from form (resilient to missing SQLite User record)
         phone = request.form.get("phone")
         address = request.form.get("address")
         
-        # Try to update SQLite user if they exist (for traditional users), but don't crash if they don't
-        try:
-            u = User.query.get(user_id)
-            if u:
-                u.phone, u.address = phone, address
-                db.session.commit()
-        except:
-            pass
-
-        db.session.add(
-            Order(
-                user_id=user_id,
-                total_amount=total,
-                delivery_address=f"{phone} | {address}",
-                tracking_number="AK-" + str(uuid.uuid4())[:8].upper(),
-            )
+        # Create Pending Order
+        new_order = Order(
+            user_id=user_id,
+            total_amount=total,
+            delivery_address=f"{phone} | {address}",
+            tracking_number="AK-" + str(uuid.uuid4())[:8].upper(),
+            payment_status="Pending"
         )
+        db.session.add(new_order)
+        db.session.commit()
+        
+        # Clear Cart
         for i in items:
             db.session.delete(i)
         db.session.commit()
-        return redirect(url_for("my_orders"))
+        
+        return redirect(url_for("payment", order_id=new_order.id))
+        
     return render_template("checkout.html", total=total)
 
+
+@app.route("/payment/<int:order_id>")
+def payment(order_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    order = Order.query.get_or_404(order_id)
+    if order.user_id != session["user_id"]:
+        return redirect(url_for("index"))
+    return render_template("payment.html", order=order)
+
+
+@app.route("/process_payment/<int:order_id>", methods=["POST"])
+def process_payment(order_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    order = Order.query.get_or_404(order_id)
+    method = request.form.get("payment_method")
+    
+    order.payment_method = method
+    if method == "COD":
+        order.payment_status = "To be Paid on Delivery"
+    else:
+        # Simulate successful online payment
+        order.payment_status = "Paid"
+        order.status = "Confirmed"
+    
+    db.session.commit()
+    return redirect(url_for("my_orders"))
 
 @app.route("/my_orders")
 def my_orders():
