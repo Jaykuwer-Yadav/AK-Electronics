@@ -177,33 +177,49 @@ from firebase_admin import auth as fb_auth
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        id_token = request.json.get("idToken")
-        if not id_token:
-            # Fallback for traditional form login if needed (e.g. dev accounts)
-            email, password = request.form.get("email"), request.form.get("password")
+        # Check if it's a JSON request (from our JS) or a form request
+        if request.is_json:
+            data = request.get_json()
+            id_token = data.get("idToken")
+            
+            if not id_token:
+                return "Missing Token", 400
+
+            try:
+                if not is_firebase_init:
+                    return "Firebase not initialized on server. Check logs.", 500
+                
+                decoded_token = fb_auth.verify_id_token(id_token)
+                uid = decoded_token['uid']
+                email = decoded_token.get('email')
+                
+                # Role mapping based on email
+                role = "user"
+                if email == "admin@ak.com": role = "admin"
+                elif email == "dev@ak.com": role = "developer"
+                
+                session["user_id"] = uid
+                session["role"] = role
+                print(f"✅ User logged in: {email} ({role})")
+                return {"status": "success"}, 200
+            except Exception as e:
+                print(f"❌ Login Error: {e}")
+                return str(e), 401
+        else:
+            # Fallback for traditional form login (bypass Firebase)
+            email = request.form.get("email")
+            password = request.form.get("password")
+            print(f"🔄 Attempting fallback login for: {email}")
+            
             if email == "admin@ak.com" and password == "ak@2026":
                 session["user_id"], session["role"] = "admin", "admin"
                 return redirect(url_for("index"))
             if email == "dev@ak.com" and password == "dev@2026":
                 session["user_id"], session["role"] = "dev", "developer"
                 return redirect(url_for("index"))
-            return "Missing Token", 400
+            
+            return "Invalid fallback credentials", 401
 
-        try:
-            decoded_token = fb_auth.verify_id_token(id_token)
-            uid = decoded_token['uid']
-            email = decoded_token.get('email')
-            
-            # Simple role mapping based on email
-            role = "user"
-            if email == "admin@ak.com": role = "admin"
-            elif email == "dev@ak.com": role = "developer"
-            
-            session["user_id"] = uid
-            session["role"] = role
-            return {"status": "success"}, 200
-        except Exception as e:
-            return str(e), 401
     return render_template("login.html")
 
 
