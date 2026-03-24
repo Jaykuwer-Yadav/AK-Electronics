@@ -33,25 +33,35 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('index') }}" style="text-decoration: none">
-        <div
-          class="brand-logo"
-          style="color: var(--text-main); font-weight: bold"
-        >
-          AK <span style="color: #e74c3c">Developer</span>
+      <div class="nav-container">
+        <!-- 1. Hamburger Menu (Mobile Only) -->
+        <div class="hamburger-menu" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-      </a>
-      <div class="nav-links">
-        <a
-          href="{{ url_for('index') }}"
-          style="text-decoration: none; font-weight: 600"
-          >Back to Store</a
-        >
-        <a
-          href="{{ url_for('logout') }}"
-          style="color: var(--text-muted); text-decoration: none"
-          >Logout</a
-        >
+
+        <!-- 2. Branding (Left desktop, Center mobile) -->
+        <div class="branding">
+          <a href="{{ url_for('index') }}" style="text-decoration: none">
+            <div class="brand-logo" style="margin: 0;">
+              AK <span style="color: #6366f1">Developer</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- 3. Desktop Nav Links -->
+        <div class="search-nav-wrapper" style="flex: 1; display: flex; justify-content: flex-end; gap: 20px; align-items: center;">
+          <a href="{{ url_for('index') }}" class="nav-link" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
+          <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--text-muted); text-decoration: none">Logout</a>
+        </div>
+
+        <!-- 4. Mobile Nav Popup -->
+        <div class="nav-content" id="navMenu">
+          <button class="close-menu" onclick="toggleMenu()">✕</button>
+          <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Store</a>
+          <a href="{{ url_for('logout') }}" class="mobile-nav-link" style="color: var(--text-muted)">Logout</a>
+        </div>
       </div>
     </nav>
 
@@ -127,6 +137,10 @@
         "data-theme",
         localStorage.getItem("theme") || "light",
       );
+
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+      }
     </script>
   </body>
 </html>

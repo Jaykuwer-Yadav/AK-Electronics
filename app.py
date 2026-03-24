@@ -483,6 +483,56 @@ def delete_product(id):
     return redirect(url_for("admin_dashboard"))
 
 
+@app.route("/admin/edit_product/<string:product_id>", methods=["GET", "POST"])
+def edit_product(product_id):
+    if session.get("role") not in ["admin", "developer"]:
+        return redirect(url_for("login"))
+    
+    product_ref = fb_db.collection("products").document(product_id)
+    product_doc = product_ref.get()
+    
+    if not product_doc.exists:
+        return redirect(url_for("admin_dashboard"))
+        
+    product_data = product_doc.to_dict()
+    product_data['id'] = product_doc.id
+    
+    if request.method == "POST":
+        update_data = {
+            "name": request.form.get("name"),
+            "price": float(request.form.get("price")),
+            "category": request.form.get("category"),
+            "sub_category": request.form.get("sub_category"),
+            "description": request.form.get("description"),
+        }
+        
+        # Handle new image if uploaded
+        files = request.files.getlist("images")
+        filenames = []
+        for f in files:
+            if f and f.filename:
+                fname = secure_filename(f.filename)
+                f.save(os.path.join(app.config["UPLOAD_FOLDER"], fname))
+                filenames.append(fname)
+        
+        if filenames:
+            update_data["image_url"] = ",".join(filenames)
+            
+        product_ref.update(update_data)
+        return redirect(url_for("admin_dashboard"))
+        
+    # Fetch categories for the select list
+    cats = []
+    cat_dict = {}
+    for doc in fb_db.collection("categories").stream():
+        c_data = doc.to_dict()
+        c_data['id'] = doc.id
+        cats.append(c_data)
+        cat_dict[c_data['name']] = c_data.get('subcategories', [])
+        
+    return render_template("edit_product.html", product=product_data, categories=cats, category_dict=cat_dict)
+
+
 @app.route("/update_order/<int:order_id>/<string:status>")
 def update_order(order_id, status):
     if session.get("role") in ["admin", "developer"]:

@@ -77,16 +77,38 @@
   </head>
   <body class="store-body">
     <nav class="navbar">
-      <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
-        <div class="brand-logo" style="margin: 0;">
-          AK <span style="color: #27ae60">Admin</span>
+      <div class="nav-container">
+        <!-- 1. Hamburger Menu (Mobile Only) -->
+        <div class="hamburger-menu" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-      </a>
-      <div style="display: flex; gap: 20px; align-items: center;">
-        <a href="{{ url_for('index') }}" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
-        <a href="{{ url_for('logout') }}" style="color: var(--text-muted); text-decoration: none">Logout</a>
+
+        <!-- 2. Branding (Left desktop, Center mobile) -->
+        <div class="branding">
+          <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
+            <div class="brand-logo" style="margin: 0;">
+              AK <span style="color: #27ae60">Admin</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- 3. Desktop Nav Links -->
+        <div class="search-nav-wrapper" style="flex: 1; display: flex; justify-content: flex-end; gap: 20px; align-items: center;">
+          <a href="{{ url_for('index') }}" class="nav-link" style="color: var(--text-main); text-decoration: none; font-weight: 600;">Store</a>
+          <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--text-muted); text-decoration: none">Logout</a>
+        </div>
+
+        <!-- 4. Mobile Nav Popup -->
+        <div class="nav-content" id="navMenu">
+          <button class="close-menu" onclick="toggleMenu()">✕</button>
+          <a href="{{ url_for('index') }}" class="mobile-nav-link">🏠 Store</a>
+          <a href="{{ url_for('logout') }}" class="mobile-nav-link" style="color: var(--text-muted)">Logout</a>
+        </div>
       </div>
     </nav>
+
 
     <div class="store-container" style="padding: 20px">
       <div class="admin-card">
@@ -184,6 +206,54 @@
           <textarea name="description" rows="3"></textarea>
           <button type="submit" class="primary-btn">List Product</button>
         </form>
+      </div>
+
+      <div class="admin-card" style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
+            <h2>🛍️ Manage Products</h2>
+            <input type="text" id="productSearch" placeholder="Search products..." style="max-width: 250px; margin: 0;">
+        </div>
+        <div class="table-container">
+          <table id="productTable">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in products %}
+              <tr>
+                <td>
+                    <img src="{{ url_for('static', filename='uploads/' + (p.image_url.split(',')[0] if p.image_url else 'default.png')) }}" 
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                </td>
+                <td style="font-weight: 600;">{{ p.name }}</td>
+                <td><span class="status-badge" style="background: rgba(0,0,0,0.05);">{{ p.category }}</span></td>
+                <td style="color: var(--primary); font-weight: 700;">₹{{ p.price }}</td>
+                <td>
+                  <div style="display: flex; gap: 10px;">
+                    <a href="{{ url_for('edit_product', product_id=p.id) }}" 
+                       class="primary-btn" 
+                       style="background: var(--primary); padding: 8px 15px; font-size: 13px; text-decoration: none;">
+                       ✏️ Edit
+                    </a>
+                    <a href="{{ url_for('delete_product', id=p.id) }}" 
+                       class="primary-btn" 
+                       style="background: #e74c3c; padding: 8px 15px; font-size: 13px; text-decoration: none;"
+                       onclick="return confirm('Permanent delete this product?')">
+                       🗑️ Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="admin-card">
@@ -399,10 +469,29 @@
           categoryData[mainCat].forEach((sub) => {
             let opt = document.createElement("option");
             opt.value = sub;
-            opt.innerHTML = sub;
+            opt.textContent = sub;
             subSelect.appendChild(opt);
           });
         }
+      }
+
+      // Product Search Filter
+      document.getElementById("productSearch").addEventListener("keyup", function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#productTable tbody tr");
+        rows.forEach(row => {
+          let name = row.cells[1].textContent.toLowerCase();
+          let category = row.cells[2].textContent.toLowerCase();
+          if (name.includes(filter) || category.includes(filter)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+
+      function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
       }
     </script>
   </body>

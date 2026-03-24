@@ -153,11 +153,26 @@ h1, h2, h3, .brand-logo {
     text-decoration: none;
     color: var(--text-main);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 6px;
-    position: relative;
+    gap: 10px;
+    background: rgba(0,0,0,0.05);
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    width: 100%;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .mobile-nav-link {
+    background: rgba(255,255,255,0.05);
+}
+
+.mobile-nav-link:hover {
+    background: var(--primary);
+    color: white;
 }
 
 .mobile-nav-link::after {
@@ -508,22 +523,44 @@ input:checked + .slider {
     
     .nav-content { 
         display: none; 
-        position: absolute;
-        top: 100%;
-        right: 0;
-        width: 100%;
+        position: fixed;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 85%;
+        max-width: 320px;
         background: var(--card-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
         flex-direction: column;
-        padding: 2rem;
-        gap: 2rem;
-        border-bottom: 1px solid var(--glass-border);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 3rem 2rem;
+        gap: 1.2rem;
+        border-radius: 30px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        z-index: 2000;
+        align-items: center;
     }
 
     .nav-content.active {
         display: flex;
+    }
+
+    .close-menu {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: transparent;
+        border: none;
+        font-size: 1.8rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: color 0.3s ease;
+        display: block !important;
+    }
+
+    .close-menu:hover {
+        color: var(--primary);
     }
 }
 

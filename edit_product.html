@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product | AK Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .current-images {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .current-image-card {
+            position: relative;
+            flex: 0 0 100px;
+        }
+        .current-image-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+        }
+    </style>
+</head>
+<body class="store-body">
+    <nav class="navbar">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none">
+                <div class="brand-logo" style="margin: 0;">
+                    AK <span style="color: #27ae60">Admin</span>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link" style="font-weight: 600; color: var(--text-main); text-decoration: none;">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="edit-container">
+        <div class="admin-card">
+            <h1 style="margin-bottom: 2rem;">✏️ Edit Product: {{ product.name }}</h1>
+            
+            <form action="{{ url_for('edit_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data">
+                <div class="input-group">
+                    <label>Product Name</label>
+                    <input type="text" name="name" value="{{ product.name }}" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label>Price (₹)</label>
+                        <input type="number" name="price" step="0.01" value="{{ product.price }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Category</label>
+                        <select name="category" id="main_category" required onchange="updateSubCategories()">
+                            {% for cat in categories %}
+                            <option value="{{ cat.name }}" {% if product.category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Sub-Category / Brand</label>
+                    <select name="sub_category" id="sub_category" required>
+                        <option value="{{ product.sub_category }}" selected>{{ product.sub_category }}</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="5" required>{{ product.description }}</textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Product Images (Upload new to replace existing)</label>
+                    <div class="current-images">
+                        {% for img in product.image_url.split(',') %}
+                        <div class="current-image-card">
+                            <img src="{{ url_for('static', filename='uploads/' + img) }}" alt="Product Image">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="file" name="images" multiple accept="image/*">
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 2rem;">
+                    <button type="submit" class="primary-btn" style="flex: 1; padding: 15px;">Update Product Details</button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="primary-btn" style="flex: 0.5; padding: 15px; background: rgba(0,0,0,0.05); color: var(--text-main); text-align: center; text-decoration: none;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script id="category-data" type="application/json">
+        {{ category_dict | tojson | safe }}
+    </script>
+    <script>
+        document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "light");
+        
+        const categoryData = JSON.parse(document.getElementById('category-data').textContent);
+
+        function updateSubCategories() {
+            const mainCat = document.getElementById('main_category').value;
+            const subSelect = document.getElementById('sub_category');
+            subSelect.innerHTML = '<option value="" disabled selected>Select Sub-Category</option>';
+            
+            if (categoryData[mainCat]) {
+                categoryData[mainCat].forEach(sub => {
+                    let opt = document.createElement('option');
+                    opt.value = sub;
+                    opt.textContent = sub;
+                    subSelect.appendChild(opt);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
