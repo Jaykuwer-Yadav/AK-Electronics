@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | AK Electronics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -58,7 +63,15 @@
       }
       @media (max-width: 768px) {
         .admin-grid { grid-template-columns: 1fr !important; }
-        .navbar { flex-wrap: wrap; gap: 10px; }
+        .navbar { 
+            padding: 10px 15px;
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center;
+        }
+        .navbar div { justify-content: center; width: 100%; }
+        .admin-card { padding: 1rem !important; }
+        th, td { padding: 10px; font-size: 0.85rem; }
       }
     </style>
   </head>
