@@ -28,26 +28,35 @@ db = SQLAlchemy(app)
 # --- 🎯 FIREBASE ADMIN SDK ---
 import json
 firebase_key_path = "firebase_key.json"
+is_firebase_init = False
 
-if os.path.exists(firebase_key_path):
-    cred = credentials.Certificate(firebase_key_path)
-    firebase_admin.initialize_app(cred)
-else:
-    firebase_config_env = os.environ.get('FIREBASE_KEY')
-    if firebase_config_env:
-        # Load from environment variable (for Render/Deployment)
-        key_dict = json.loads(firebase_config_env)
-        # THE MAGIC FIX: Replace literal "\\n" with real newlines
-        if 'private_key' in key_dict:
-            key_dict['private_key'] = key_dict['private_key'].replace('\\n', '\n')
-        
-        cred = credentials.Certificate(key_dict)
+try:
+    if os.path.exists(firebase_key_path):
+        cred = credentials.Certificate(firebase_key_path)
         firebase_admin.initialize_app(cred)
+        is_firebase_init = True
     else:
-        print("⚠️ Firebase Key not found. Backend features may fail.")
+        # Check for FIREBASE_KEY or FIREBASE_CONFIG
+        firebase_config_env = os.environ.get('FIREBASE_KEY') or os.environ.get('FIREBASE_CONFIG')
+        if firebase_config_env:
+            key_dict = json.loads(firebase_config_env)
+            if 'private_key' in key_dict:
+                key_dict['private_key'] = key_dict['private_key'].replace('\\n', '\n')
+            
+            cred = credentials.Certificate(key_dict)
+            firebase_admin.initialize_app(cred)
+            is_firebase_init = True
+        else:
+            print("❌ Firebase Key not found in environment or file.")
+except Exception as e:
+    print(f"❌ Firebase Initialization Error: {e}")
 
-fb_db = firestore.client()
-print("✅ Firebase Admin initialized successfully!")
+if is_firebase_init:
+    fb_db = firestore.client()
+    print("✅ Firebase Admin initialized successfully!")
+else:
+    fb_db = None
+    print("⚠️ Warning: Firebase features will be disabled.")
 
 
 # --- DATABASE MODELS ---
